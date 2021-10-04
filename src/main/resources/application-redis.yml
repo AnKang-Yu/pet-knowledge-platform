@@ -1,0 +1,11 @@
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    jedis:
+      pool:
+        # \u8FDE\u63A5\u6C60\u6700\u5927\u8FDE\u63A5\u6570
+        max-active: 8
+        # \u8FDE\u63A5\u6C60\u4E2D\u7684\u6700\u5927\u7A7A\u95F2\u8FDE\u63A5
+        max-idle: 8

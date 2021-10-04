@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.dg.dgpethome.mapper.SysUserMapper">
+ <resultMap id="BaseResultMap" type="xyz.dg.dgpethome.model.po.SysUser">
+    <!--@mbg.generated-->
+    <!--@Table `pethome_user`-->
+    <id column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_account" jdbcType="VARCHAR" property="userAccount" />
+    <result column="user_password" jdbcType="VARCHAR" property="userPassword" />
+    <result column="user_salt" jdbcType="VARCHAR" property="userSalt" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="user_avatar" jdbcType="VARCHAR" property="userAvatar" />
+    <result column="user_email" jdbcType="VARCHAR" property="userEmail" />
+    <result column="user_phone" jdbcType="VARCHAR" property="userPhone" />
+    <result column="user_birthday" jdbcType="TIMESTAMP" property="userBirthday" />
+    <result column="user_sex" jdbcType="TINYINT" property="userSex" />
+    <result column="user_role_id" jdbcType="INTEGER" property="userRoleId" />
+    <result column="create_user" jdbcType="INTEGER" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_user" jdbcType="INTEGER" property="updateUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="user_status" jdbcType="INTEGER" property="userStatus" />
+    <result column="user_token" jdbcType="VARCHAR" property="userToken" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    `user_id`, `user_account`, `user_password`, `user_salt`, `user_name`, `user_avatar`,
+    `user_email`, `user_phone`, `user_birthday`, `user_sex`, `user_role_id`, `create_user`,
+    `create_time`, `update_user`, `update_time`, `user_status`, `user_token`
+  </sql>
+</mapper>

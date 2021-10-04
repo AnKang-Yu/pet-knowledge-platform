@@ -1,0 +1,16 @@
+spring:
+  # \u6570\u636E\u6E90\u914D\u7F6E
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:9458/PetHome?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: Dugong9458
+#    url: jdbc:mysql://1.15.145.81:3738/SpringBoot?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+#    username: Dugong
+#    password: 136!!9458
+
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 10
+      min-idle: 5
+      max-active: 30

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.dg.dgpethome.mapper.SysDictMapper">
+  <resultMap id="BaseResultMap" type="xyz.dg.dgpethome.model.po.SysDict">
+    <!--@mbg.generated-->
+    <!--@Table sys_dict-->
+    <id column="dict_id" jdbcType="INTEGER" property="dictId" />
+    <result column="dict_parent_id" jdbcType="INTEGER" property="dictParentId" />
+    <result column="dict_code" jdbcType="VARCHAR" property="dictCode" />
+    <result column="dict_key" jdbcType="INTEGER" property="dictKey" />
+    <result column="dict_value" jdbcType="VARCHAR" property="dictValue" />
+    <result column="dict_sort" jdbcType="INTEGER" property="dictSort" />
+    <result column="dict_remark" jdbcType="VARCHAR" property="dictRemark" />
+    <result column="dict_status" jdbcType="INTEGER" property="dictStatus" />
+    <result column="dict_parent_value" jdbcType="VARCHAR" property="dictParentValue" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    dict_id, dict_parent_id, dict_code, dict_key, dict_value, dict_sort, dict_remark, 
+    dict_status, dict_parent_value
+  </sql>
+</mapper>
