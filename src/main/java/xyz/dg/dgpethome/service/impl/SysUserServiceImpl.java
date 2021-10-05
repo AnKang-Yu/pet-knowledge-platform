@@ -1,28 +1,26 @@
 package xyz.dg.dgpethome.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import javax.naming.AuthenticationException;
-import java.util.List;
-import java.util.Map;
+
 
 import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.mapper.SysUserMapper;
-//import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
+import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 import xyz.dg.dgpethome.service.SysUserService;
-//import xyz.dg.dgpethome.utils.BCryptPasswordEncoderUtil;
+
+import java.util.List;
 
 /**
  * @author  Dugong
@@ -97,19 +95,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
      * @return
      */
     @Override
-    public IPage<SysUser> findUserList(SysUserPageParam sysUserPageParam) {
-        //分页对象
+    public IPage<SysUserVo> findUserList( SysUserPageParam sysUserPageParam) {
+        //原分页对象
         IPage<SysUser> userPage = new Page<>();
         userPage.setPages(sysUserPageParam.getPageSize());
         userPage.setCurrent(sysUserPageParam.getCurrentPage());
-        //构造查询条件
-        QueryWrapper<SysUser> query = new QueryWrapper<>();
+        //构造用户表查询条件
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         //用户名不为空就查用户名
-        String userAccount  = sysUserPageParam.getSysUser().getUserAccount();
-        if(StringUtils.isNotEmpty(userAccount)){
-            query.lambda().like(SysUser::getUserAccount,userAccount);
+        String userName  = sysUserPageParam.getUserName();
+        if(StringUtils.isNotEmpty(userName)){
+            queryWrapper.lambda().like(SysUser::getUserName,userName);
         }
-        return this.baseMapper.selectPage(userPage,query);
+        return  this.baseMapper.selectPage(userPage,queryWrapper)
+                .convert(item-> BeanUtil.copyProperties(item,SysUserVo.class));
+
     }
 
 

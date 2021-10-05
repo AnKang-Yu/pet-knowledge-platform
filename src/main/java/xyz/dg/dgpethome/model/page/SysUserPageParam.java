@@ -1,7 +1,9 @@
 package xyz.dg.dgpethome.model.page;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import xyz.dg.dgpethome.model.po.SysUser;
+import xyz.dg.dgpethome.model.vo.SysUserVo;
 
 /**
  * @author Dugong
@@ -10,12 +12,13 @@ import xyz.dg.dgpethome.model.po.SysUser;
  * 根据用户数据和当前页和页容量进行分页
  **/
 @Data
+@AllArgsConstructor
 public class SysUserPageParam {
 
     /**
-     * 查询参数
+     * 用户名
      */
-    private SysUser sysUser;
+    private String userName;
     /**
      * 页容量
      */

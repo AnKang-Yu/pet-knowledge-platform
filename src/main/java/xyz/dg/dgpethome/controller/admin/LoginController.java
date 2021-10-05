@@ -10,6 +10,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
+import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.service.SysUserService;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
@@ -28,7 +29,7 @@ import java.util.Set;
  * @description
  **/
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/admin")
 public class LoginController {
 //    @Resource
@@ -89,13 +90,8 @@ public class LoginController {
     public JsonResult getInfo(HttpServletRequest request) throws Exception {
         //根据传来的token获取id
         String token = request.getHeader("Authorization");
-        //System.out.println(token);
-        //System.out.println("当前会话是否登录：" + StpUtil.isLogin());
-        //System.out.println("当前会话的token"+StpUtil.getTokenInfo());
         System.out.println("后台传来的token:"+token);
-        //System.out.println("根据传来的token获取id"+StpUtil.getLoginIdByToken(token));
         Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
-        //System.out.println("传来的token获取的id= "+userId);
         if(userId == null){
             return JsonResultUtils.error("获取信息失败");
         }
@@ -115,13 +111,15 @@ public class LoginController {
     }
 
     /**
-     * 根据传入的用户信息,分页容量，当前页进行用户查询
-     * @param sysUserPageParam
+     * 根据传入的用户信息,分页容量，当前页进行用户查询 SysUserPageParam sysUserPageParam
+     * @param
      * @return
      */
     @GetMapping("/findUserList")
     public JsonResult findUserList(SysUserPageParam sysUserPageParam){
-        IPage<SysUser> userList = sysUserServiceImpl.findUserList(sysUserPageParam);
+        System.out.println(sysUserPageParam.toString());
+        IPage<SysUserVo> userList = sysUserServiceImpl.findUserList(sysUserPageParam);
+        System.out.println(userList.toString());
         return JsonResultUtils.success("查询成功",userList);
 
     }
@@ -164,7 +162,7 @@ public class LoginController {
      * @return
      */
     @PostMapping("/deleteUser")
-    public JsonResult editSysUser(@RequestParam Integer userId){
+    public JsonResult editSysUser(@PathVariable("userId") Integer userId){
         //影响行数
         boolean rows = sysUserServiceImpl.removeById(userId);
         if(rows){

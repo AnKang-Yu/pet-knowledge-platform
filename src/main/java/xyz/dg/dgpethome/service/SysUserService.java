@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
+import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 //import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 
@@ -34,5 +35,5 @@ public interface SysUserService extends IService<SysUser> {
     SysUser checkLogin(String userName,String rawPassword) throws MyAuthenticationException;
 
 
-    IPage<SysUser> findUserList(SysUserPageParam sysUserPageParam);
+    IPage<SysUserVo> findUserList(SysUserPageParam sysUserPageParam);
 }
