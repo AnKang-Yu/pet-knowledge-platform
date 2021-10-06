@@ -20,6 +20,14 @@ public class SysUserPageParam {
      */
     private String userName;
     /**
+     * 用户角色id
+     */
+    private Integer userRoleId;
+    /**
+     * 用户角色id父主键
+     */
+    private Integer dictParentId;
+    /**
      * 页容量
      */
     private Long pageSize;

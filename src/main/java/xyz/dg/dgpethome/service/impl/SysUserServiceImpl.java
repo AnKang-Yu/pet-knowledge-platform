@@ -48,7 +48,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
                 .eq(SysUser::getUserName,userName);
                 //.eq(SysUser::getUserStatus,USER_STATE);
         //用getOne查询一个对象出来
-        SysUser user = this.getOne(lambdaQueryWrapper);
+        SysUser user = this.baseMapper.selectOne(lambdaQueryWrapper);
         return  user;
     }
 
@@ -104,14 +104,30 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
         //用户名不为空就查用户名
         String userName  = sysUserPageParam.getUserName();
+        //要查询的用户id
+        Integer userRoleId = sysUserPageParam.getUserRoleId();
+        if(userRoleId != null){
+            queryWrapper.lambda().eq(SysUser::getUserRoleId,userRoleId);
+        }
         if(StringUtils.isNotEmpty(userName)){
             queryWrapper.lambda().like(SysUser::getUserName,userName);
         }
+        
         return  this.baseMapper.selectPage(userPage,queryWrapper)
                 .convert(item-> BeanUtil.copyProperties(item,SysUserVo.class));
 
     }
 
+    /**
+     * 密码加密
+     * @param sysUser
+     * @return
+     */
+    @Override
+    public SysUser passwordToEncode(SysUser sysUser) {
+        sysUser.setUserPassword(SaSecureUtil.sha256(sysUser.getUserPassword()));
+        return sysUser;
+    }
 
 
 }

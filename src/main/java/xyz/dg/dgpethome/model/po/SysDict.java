@@ -1,6 +1,10 @@
 package xyz.dg.dgpethome.model.po;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,10 +20,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@TableName("sys_dict")
 public class SysDict implements Serializable {
     /**
     * 字典表主键
     */
+    @TableId(type = IdType.AUTO)
     private Integer dictId;
 
     /**

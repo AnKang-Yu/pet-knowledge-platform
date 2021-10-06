@@ -26,14 +26,25 @@ public interface SysUserService extends IService<SysUser> {
      */
     SysUser getUserByUserUsername(String userName);
 
-//    /**
-//     * 个性化验证登录
-//     * @param userAccount 账号
-//     * @param rawPassword 原始密码
-//     * @return
-//     */
+    /**
+     * 个性化验证登录
+     * @param userName 用户名
+     * @param rawPassword 原始密码
+     * @return
+     */
     SysUser checkLogin(String userName,String rawPassword) throws MyAuthenticationException;
 
-
+    /**
+     * 分页查询并包装
+     * @param sysUserPageParam
+     * @return
+     */
     IPage<SysUserVo> findUserList(SysUserPageParam sysUserPageParam);
+
+    /**
+     * 对新增用户的密码进行加密
+     * @param sysUser
+     * @return
+     */
+    SysUser passwordToEncode(SysUser sysUser);
 }

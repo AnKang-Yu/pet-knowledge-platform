@@ -3,6 +3,8 @@ package xyz.dg.dgpethome.controller.admin;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,7 +33,8 @@ import java.util.Set;
 @RestController
 //@CrossOrigin
 @RequestMapping("/admin")
-public class LoginController {
+@Slf4j
+public class AdminController {
 //    @Resource
 //    UserDetailsService authuserDetailsService;
 
@@ -61,6 +64,7 @@ public class LoginController {
      */
     @PostMapping("/login")
     public JsonResult login(@RequestBody Map<String,String> loginInfo) {
+        log.info("正在验证登录信息");
         //拿对应的用户账户名和密码
         String username =  loginInfo.get("username");
         String password =  loginInfo.get("password");
@@ -90,7 +94,7 @@ public class LoginController {
     public JsonResult getInfo(HttpServletRequest request) throws Exception {
         //根据传来的token获取id
         String token = request.getHeader("Authorization");
-        System.out.println("后台传来的token:"+token);
+        log.info("后台传入的token: "+token);
         Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
         if(userId == null){
             return JsonResultUtils.error("获取信息失败");
@@ -106,6 +110,7 @@ public class LoginController {
     }
     @PostMapping("logout")
     public JsonResult logout() {
+        log.info("正在执行退出方法");
         StpUtil.logout();
         return JsonResultUtils.success("退出成功");
     }
@@ -117,9 +122,9 @@ public class LoginController {
      */
     @GetMapping("/findUserList")
     public JsonResult findUserList(SysUserPageParam sysUserPageParam){
-        System.out.println(sysUserPageParam.toString());
+        log.info("查找的用户参数 ： " + sysUserPageParam.toString());
         IPage<SysUserVo> userList = sysUserServiceImpl.findUserList(sysUserPageParam);
-        System.out.println(userList.toString());
+        //System.out.println(userList.toString());
         return JsonResultUtils.success("查询成功",userList);
 
     }
@@ -129,8 +134,19 @@ public class LoginController {
      */
     @PostMapping("/addUser")
     public JsonResult addSysUser(@RequestBody SysUser sysUser){
+        log.info("执行添加用户方法");
+        //判断用户名唯一性
+        if(StringUtils.isNotEmpty(sysUser.getUserName())){
+            //用户名不为空才去判断
+            if(sysUserServiceImpl.getUserByUserUsername(sysUser.getUserName())!=null){
+                //用户名在数据库中存在
+                return JsonResultUtils.error("新增用户失败 , 用户名已存在");
+            }
+        }
+        //新增用户的密码加密
+        SysUser encodeUser =  sysUserServiceImpl.passwordToEncode(sysUser);
         //影响行数
-        boolean rows = sysUserServiceImpl.save(sysUser);
+        boolean rows = sysUserServiceImpl.save(encodeUser);
         if(rows){
             //200
             return JsonResultUtils.success("新增用户成功");
@@ -144,8 +160,9 @@ public class LoginController {
      * @param sysUser
      * @return
      */
-    @PostMapping("/editUser")
+    @PutMapping("/editUser")
     public JsonResult editSysUser(@RequestBody SysUser sysUser){
+        log.info("执行编辑用户方法");
         //影响行数
         boolean rows = sysUserServiceImpl.updateById(sysUser);
         if(rows){
@@ -161,8 +178,9 @@ public class LoginController {
      * @param userId
      * @return
      */
-    @PostMapping("/deleteUser")
+    @DeleteMapping("/deleteUser/{userId}")
     public JsonResult editSysUser(@PathVariable("userId") Integer userId){
+        log.info("执行删除用户方法");
         //影响行数
         boolean rows = sysUserServiceImpl.removeById(userId);
         if(rows){

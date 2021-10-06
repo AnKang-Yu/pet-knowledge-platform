@@ -1,4 +1,4 @@
-# 宠物知识平台
+# 宠物知识平台后台接口
 
 #### 介绍
 Springboot搭建后台，后台管理系统打算用vue-element-template搭建，前端打算用uniapp
