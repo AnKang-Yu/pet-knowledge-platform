@@ -1,12 +1,13 @@
 package xyz.dg.dgpethome.mapper;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
+import xyz.dg.dgpethome.model.vo.SysUserVo;
+
+import java.util.List;
 
 /**
  * @author  Dugong
@@ -17,4 +18,8 @@ import xyz.dg.dgpethome.model.po.SysUser;
 public interface SysUserMapper extends BaseMapper<SysUser> {
 //    @Select("SELECT * FROM `sys_user` WHERE `user_account` = #{userAccount,jdbcType=VARCHAR}")
 //    SysUser getUserByUserAccount(String userAccount);
+
+    List<SysUserVo> findUserList(@Param("sysUserPageParam") SysUserPageParam sysUserPageParam);
+
+
 }

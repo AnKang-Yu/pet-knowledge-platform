@@ -47,4 +47,6 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      */
     SysUser passwordToEncode(SysUser sysUser);
+
+    //IPage<SysUserVo> testPage(SysUserPageParam sysUserPageParam);
 }

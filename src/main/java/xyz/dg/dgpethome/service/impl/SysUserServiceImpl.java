@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import javax.naming.AuthenticationException;
 
 
@@ -32,7 +34,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
 
 //    @Autowired
 //    BCryptPasswordEncoderUtil bCryptPasswordEncoderUtil;
-
+    @Resource
+    private  SysUserMapper sysUserMapper;
     //用户状态   字典里id是31
     private static final Integer USER_STATE = 31;
     /**
@@ -88,34 +91,58 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
 
         return  user;
     }
-
+//    @Override
+//    public IPage<SysUserVo> testPage(SysUserPageParam sysUserPageParam){
+//        IPage<SysUserVo> userVoIPage = new Page<>();
+//        userVoIPage.setPages(sysUserPageParam.getPageSize());
+//        userVoIPage.setCurrent(sysUserPageParam.getCurrentPage());
+//        List<SysUserVo> list = sysUserMapper.testPage(sysUserPageParam);
+//        System.out.println(list.toString());
+//
+//        //List<SysUserVo> newList = (List<SysUserVo>) list.stream().map(item->BeanUtil.copyProperties(item,SysUserVo.class));
+//        userVoIPage.setRecords(list);
+//
+//
+//        return   userVoIPage;
+//    }
     /**
      * 分页
      * @param sysUserPageParam
      * @return
      */
     @Override
-    public IPage<SysUserVo> findUserList( SysUserPageParam sysUserPageParam) {
-        //原分页对象
-        IPage<SysUser> userPage = new Page<>();
-        userPage.setPages(sysUserPageParam.getPageSize());
-        userPage.setCurrent(sysUserPageParam.getCurrentPage());
-        //构造用户表查询条件
-        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-        //用户名不为空就查用户名
-        String userName  = sysUserPageParam.getUserName();
-        //要查询的用户id
-        Integer userRoleId = sysUserPageParam.getUserRoleId();
-        if(userRoleId != null){
-            queryWrapper.lambda().eq(SysUser::getUserRoleId,userRoleId);
-        }
-        if(StringUtils.isNotEmpty(userName)){
-            queryWrapper.lambda().like(SysUser::getUserName,userName);
-        }
-        
-        return  this.baseMapper.selectPage(userPage,queryWrapper)
-                .convert(item-> BeanUtil.copyProperties(item,SysUserVo.class));
+    public IPage<SysUserVo> findUserList(SysUserPageParam sysUserPageParam) {
+        //旧方式不能连接多表
+//        //原分页对象
+//        IPage<SysUser> userPage = new Page<>();
+//        userPage.setPages(sysUserPageParam.getPageSize());
+//        userPage.setCurrent(sysUserPageParam.getCurrentPage());
+//        //构造用户表查询条件
+//        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+//        //用户名不为空就查用户名
+//        String userName  = sysUserPageParam.getUserName();
+//        //要查询的用户id
+//        Integer userRoleId = sysUserPageParam.getUserRoleId();
+//        if(userRoleId != null){
+//            queryWrapper.lambda().eq(SysUser::getUserRoleId,userRoleId);
+//        }
+//        if(StringUtils.isNotEmpty(userName)){
+//            queryWrapper.lambda().like(SysUser::getUserName,userName);
+//        }
+//        return  this.baseMapper.selectPage(userPage,queryWrapper)
+//                .convert(item-> BeanUtil.copyProperties(item,SysUserVo.class));
 
+        IPage<SysUserVo> userVoIPage = new Page<>();
+        userVoIPage.setPages(sysUserPageParam.getPageSize());
+        userVoIPage.setCurrent(sysUserPageParam.getCurrentPage());
+        
+        List<SysUserVo> list = sysUserMapper.findUserList(sysUserPageParam);
+        System.out.println(list.toString());
+
+        //List<SysUserVo> newList = (List<SysUserVo>) list.stream().map(item->BeanUtil.copyProperties(item,SysUserVo.class));
+        userVoIPage.setRecords(list);
+
+        return   userVoIPage;
     }
 
     /**

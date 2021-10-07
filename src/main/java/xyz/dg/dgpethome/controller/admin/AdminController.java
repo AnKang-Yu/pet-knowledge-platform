@@ -123,6 +123,7 @@ public class AdminController {
     @GetMapping("/findUserList")
     public JsonResult findUserList(SysUserPageParam sysUserPageParam){
         log.info("查找的用户参数 ： " + sysUserPageParam.toString());
+        //IPage<SysUserVo> userList = sysUserServiceImpl.testPage(sysUserPageParam);
         IPage<SysUserVo> userList = sysUserServiceImpl.findUserList(sysUserPageParam);
         //System.out.println(userList.toString());
         return JsonResultUtils.success("查询成功",userList);
