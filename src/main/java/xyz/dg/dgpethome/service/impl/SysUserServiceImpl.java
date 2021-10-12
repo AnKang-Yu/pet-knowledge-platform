@@ -135,12 +135,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
         IPage<SysUserVo> userVoIPage = new Page<>();
         userVoIPage.setPages(sysUserPageParam.getPageSize());
         userVoIPage.setCurrent(sysUserPageParam.getCurrentPage());
-        
-        List<SysUserVo> list = sysUserMapper.findUserList(sysUserPageParam);
-        System.out.println(list.toString());
-
+        //sysUserPageParam.setPageLimit((sysUserPageParam.getCurrentPage()-1)*sysUserPageParam.getPageSize());
+        List<SysUserVo> totalList = sysUserMapper.findUserList(sysUserPageParam);
+        //开始
+        Long front = (sysUserPageParam.getCurrentPage()-1)*sysUserPageParam.getPageSize();
+        //结尾
+        Long end = Math.min(sysUserPageParam.getCurrentPage()*sysUserPageParam.getPageSize(),totalList.size());
+        List<SysUserVo> limitList = totalList.subList(front.intValue(),end.intValue());
+        System.out.println(limitList.toString());
         //List<SysUserVo> newList = (List<SysUserVo>) list.stream().map(item->BeanUtil.copyProperties(item,SysUserVo.class));
-        userVoIPage.setRecords(list);
+        userVoIPage.setRecords(limitList);
+        userVoIPage.setTotal(totalList.size());
+
+
 
         return   userVoIPage;
     }

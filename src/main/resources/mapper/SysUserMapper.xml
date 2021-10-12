@@ -4,7 +4,7 @@
 <mapper namespace="xyz.dg.dgpethome.mapper.SysUserMapper">
  <resultMap id="BaseResultMap" type="xyz.dg.dgpethome.model.po.SysUser">
     <!--@mbg.generated-->
-    <!--@Table `pethome_user`-->
+    <!--@Table `sys_user`-->
     <id column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="user_account" jdbcType="VARCHAR" property="userAccount" />
     <result column="user_password" jdbcType="VARCHAR" property="userPassword" />
@@ -31,7 +31,7 @@
   </sql>
   <resultMap id="BaseResultMap_Vo" type="xyz.dg.dgpethome.model.vo.SysUserVo">
     <!--@mbg.generated-->
-    <!--@Table `pethome_user`-->
+    <!--@Table `sys_user`-->
     <id column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="user_account" jdbcType="VARCHAR" property="userAccount" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
@@ -51,8 +51,12 @@
       join `sys_user` u on u.user_role_id = d1.dict_id
         <where>
             d1.dict_parent_id = #{sysUserPageParam.dictParentId}
-            and
-            u.user_name LIKE concat('%',#{sysUserPageParam.userName,jdbcType=VARCHAR},'%')
+            <if test="sysUserPageParam.userName != null">
+                and
+                u.user_name LIKE concat('%',#{sysUserPageParam.userName,jdbcType=VARCHAR},'%')
+            </if>
+
         </where>
+<!--        Limit #{sysUserPageParam.pageLimit} , #{sysUserPageParam.pageSize}-->
     </select>
 </mapper>

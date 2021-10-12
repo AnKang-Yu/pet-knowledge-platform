@@ -2,6 +2,7 @@ package xyz.dg.dgpethome.model.page;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
 
@@ -13,6 +14,7 @@ import xyz.dg.dgpethome.model.vo.SysUserVo;
  **/
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class SysUserPageParam {
 
     /**
@@ -35,4 +37,8 @@ public class SysUserPageParam {
      * 当前页
      */
     private Long currentPage;
+//    /**
+//     * 从第几页数据开始拿
+//     */
+//    private Long PageLimit;
 }

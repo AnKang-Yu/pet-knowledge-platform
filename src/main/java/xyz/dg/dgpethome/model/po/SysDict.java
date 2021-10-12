@@ -32,6 +32,10 @@ public class SysDict implements Serializable {
     * 父主键
     */
     private Integer dictParentId;
+    /**
+     * 父字典名称
+     */
+    private String dictParentValue;
 
     /**
     * 字典码
@@ -63,10 +67,7 @@ public class SysDict implements Serializable {
     */
     private Integer dictStatus;
 
-    /**
-    * 父字典名称
-    */
-    private String dictParentValue;
+
 
     private static final long serialVersionUID = 1L;
 }

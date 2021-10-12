@@ -19,4 +19,32 @@
     dict_id, dict_parent_id, dict_code, dict_key, dict_value, dict_sort, dict_remark, 
     dict_status, dict_parent_value
   </sql>
+
+   <resultMap id="BaseResultMap_Vo" type="xyz.dg.dgpethome.model.vo.SysDictVo">
+    <!--@mbg.generated-->
+    <!--@Table sys_dict-->
+    <id column="dict_id" jdbcType="INTEGER" property="dictId" />
+    <result column="dict_parent_id" jdbcType="INTEGER" property="dictParentId" />
+    <result column="dict_code" jdbcType="VARCHAR" property="dictCode" />
+    <result column="dict_value" jdbcType="VARCHAR" property="dictValue" />
+    <result column="dict_remark" jdbcType="VARCHAR" property="dictRemark" />
+    <result column="dict_status" jdbcType="INTEGER" property="dictStatus" />
+    <result column="dict_parent_value" jdbcType="VARCHAR" property="dictParentValue" />
+  </resultMap>
+  <sql id="Base_Column_List_Vo">
+    <!--@mbg.generated-->
+    dict_id, dict_parent_id, dict_code, dict_value, dict_remark,
+    dict_status, dict_parent_value
+  </sql>
+
+  <select id="findDictList" resultMap="BaseResultMap_Vo" parameterType="xyz.dg.dgpethome.model.page.SysDictPageParam">
+    SELECT
+      <include refid="Base_Column_List_Vo" />
+    FROM `sys_dict` d1
+    <where>
+        <if test="sysDictPageParam.dictParentId != null">
+            d1.dict_parent_id = #{sysDictPageParam.dictParentId}
+        </if>
+    </where>
+  </select>
 </mapper>

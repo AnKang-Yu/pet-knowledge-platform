@@ -4,6 +4,8 @@ import cn.dev33.satoken.secure.SaSecureUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import xyz.dg.dgpethome.model.vo.CascaderSysDictVo;
+import xyz.dg.dgpethome.service.SysDictService;
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.authority.SimpleGrantedAuthority;
 //import org.springframework.security.core.userdetails.UserDetails;
@@ -12,15 +14,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 //import xyz.dg.dgpethome.utils.JwtTokenUtil;
 
 
+import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @SpringBootTest
 class DgpethomeApplicationTests {
 
+    @Resource
+    private SysDictService sysDictServiceImpl;
+    @Test
+    public void testAllDict(){
+        List<CascaderSysDictVo> test =  sysDictServiceImpl.findAllDictByParentId();
+        System.out.println(test.toString());
+    }
 
     @Test
     public void testSalt(){

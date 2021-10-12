@@ -13,6 +13,7 @@ import xyz.dg.dgpethome.model.po.SysUser;
  **/
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class SysUserVo  {
     /**
      * 用户表主键

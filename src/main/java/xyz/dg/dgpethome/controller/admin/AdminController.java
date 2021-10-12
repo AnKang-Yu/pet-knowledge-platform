@@ -32,7 +32,6 @@ import java.util.Set;
  **/
 @RestController
 //@CrossOrigin
-@RequestMapping("/admin")
 @Slf4j
 public class AdminController {
 //    @Resource
@@ -48,7 +47,7 @@ public class AdminController {
      * @param loginInfo
      * @return
      */
-    @GetMapping("/hello")
+    @GetMapping("/admin/hello")
     public JsonResult hello(@RequestBody Map<String,String> loginInfo){
         String username =  loginInfo.get("username");
         String password =  loginInfo.get("password");
@@ -62,7 +61,7 @@ public class AdminController {
      * 登录
      * @return
      */
-    @PostMapping("/login")
+    @PostMapping("/admin/login")
     public JsonResult login(@RequestBody Map<String,String> loginInfo) {
         log.info("正在验证登录信息");
         //拿对应的用户账户名和密码
@@ -90,7 +89,7 @@ public class AdminController {
      * 获取用户信息
      * @return
      */
-    @GetMapping("info")
+    @GetMapping("/admin/info")
     public JsonResult getInfo(HttpServletRequest request) throws Exception {
         //根据传来的token获取id
         String token = request.getHeader("Authorization");
@@ -108,7 +107,7 @@ public class AdminController {
         return JsonResultUtils.success("获取信息成功",data);
 
     }
-    @PostMapping("logout")
+    @PostMapping("/admin/logout")
     public JsonResult logout() {
         log.info("正在执行退出方法");
         StpUtil.logout();
@@ -120,7 +119,7 @@ public class AdminController {
      * @param
      * @return
      */
-    @GetMapping("/findUserList")
+    @GetMapping("/admin/findUserList")
     public JsonResult findUserList(SysUserPageParam sysUserPageParam){
         log.info("查找的用户参数 ： " + sysUserPageParam.toString());
         //IPage<SysUserVo> userList = sysUserServiceImpl.testPage(sysUserPageParam);
@@ -133,7 +132,7 @@ public class AdminController {
      * 添加单个用户(管理员 或者 普通用户)
      * @return
      */
-    @PostMapping("/addUser")
+    @PostMapping("/admin/addUser")
     public JsonResult addSysUser(@RequestBody SysUser sysUser){
         log.info("执行添加用户方法");
         //判断用户名唯一性
@@ -161,7 +160,7 @@ public class AdminController {
      * @param sysUser
      * @return
      */
-    @PutMapping("/editUser")
+    @PutMapping("/admin/editUser")
     public JsonResult editSysUser(@RequestBody SysUser sysUser){
         log.info("执行编辑用户方法");
         //影响行数
@@ -179,7 +178,7 @@ public class AdminController {
      * @param userId
      * @return
      */
-    @DeleteMapping("/deleteUser/{userId}")
+    @DeleteMapping("/admin/deleteUser/{userId}")
     public JsonResult editSysUser(@PathVariable("userId") Integer userId){
         log.info("执行删除用户方法");
         //影响行数
