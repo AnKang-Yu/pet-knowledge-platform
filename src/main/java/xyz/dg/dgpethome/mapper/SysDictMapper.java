@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -21,7 +22,7 @@ import xyz.dg.dgpethome.model.vo.SysUserVo;
  **/
 public interface SysDictMapper extends BaseMapper<SysDict> {
 
-    List<SysDictVo> findDictList(@Param("sysDictPageParam") SysDictPageParam sysDictPageParam);
+    IPage<SysDictVo> findDictList(IPage<SysDictVo> page , @Param("sysDictPageParam") SysDictPageParam sysDictPageParam);
 
     @Select("SELECT dict_id, dict_value FROM sys_dict WHERE dict_parent_id = #{dictParentId} ")
     List<SysDictVo> findDictByParentId(Integer dictParentId);

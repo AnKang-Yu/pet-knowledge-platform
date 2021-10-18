@@ -36,29 +36,22 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     @Override
     public IPage<SysDictVo> findDictList(SysDictPageParam sysDictPageParam){
-        IPage<SysDictVo> dictVoIPage = new Page<>();
-        dictVoIPage.setPages(sysDictPageParam.getPageSize());
-        dictVoIPage.setCurrent(sysDictPageParam.getCurrentPage());
-        List<SysDictVo> totalList = sysDictMapper.findDictList(sysDictPageParam);
-        List<SysDictVo> limitList = new ArrayList<>();
+
+        Long currentPage = sysDictPageParam.getCurrentPage();
+        Long pageSize = sysDictPageParam.getPageSize();
+
+
+        IPage<SysDictVo> dictVoIPage = sysDictMapper.findDictList(new Page<SysDictVo>(currentPage,pageSize),sysDictPageParam);
+
+        List<SysDictVo> totalList = dictVoIPage.getRecords();
         if(totalList == null || totalList.size()<1){
             LambdaQueryWrapper<SysDict> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             lambdaQueryWrapper
                     .eq(SysDict::getDictId,sysDictPageParam.getDictParentId());
-
-            limitList.add(BeanUtil.copyProperties(this.baseMapper.selectOne(lambdaQueryWrapper),SysDictVo.class));
-        }else{
-            //开始
-            Long front = (sysDictPageParam.getCurrentPage()-1)*sysDictPageParam.getPageSize();
-            //结尾
-            Long end = Math.min(sysDictPageParam.getCurrentPage()*sysDictPageParam.getPageSize(),totalList.size());
-            limitList = totalList.subList(front.intValue(),end.intValue());
+            List<SysDictVo> temp = new ArrayList<>();
+            temp.add(BeanUtil.copyProperties(this.baseMapper.selectOne(lambdaQueryWrapper),SysDictVo.class));
+            dictVoIPage.setRecords(temp);
         }
-
-        System.out.println(limitList.toString());
-        //List<SysUserVo> newList = (List<SysUserVo>) list.stream().map(item->BeanUtil.copyProperties(item,SysUserVo.class));
-        dictVoIPage.setRecords(limitList);
-        dictVoIPage.setTotal(totalList.size());
         return   dictVoIPage;
     }
 

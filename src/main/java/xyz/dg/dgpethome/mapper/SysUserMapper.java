@@ -19,7 +19,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 //    @Select("SELECT * FROM `sys_user` WHERE `user_account` = #{userAccount,jdbcType=VARCHAR}")
 //    SysUser getUserByUserAccount(String userAccount);
 
-    List<SysUserVo> findUserList(@Param("sysUserPageParam") SysUserPageParam sysUserPageParam);
+    IPage<SysUserVo> findUserList(IPage<SysUserVo> page, @Param("sysUserPageParam")SysUserPageParam sysUserPageParam);
 
 
 }

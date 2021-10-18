@@ -23,6 +23,7 @@ import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 import xyz.dg.dgpethome.service.SysUserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author  Dugong
@@ -91,64 +92,31 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
 
         return  user;
     }
-//    @Override
-//    public IPage<SysUserVo> testPage(SysUserPageParam sysUserPageParam){
-//        IPage<SysUserVo> userVoIPage = new Page<>();
-//        userVoIPage.setPages(sysUserPageParam.getPageSize());
-//        userVoIPage.setCurrent(sysUserPageParam.getCurrentPage());
-//        List<SysUserVo> list = sysUserMapper.testPage(sysUserPageParam);
-//        System.out.println(list.toString());
-//
-//        //List<SysUserVo> newList = (List<SysUserVo>) list.stream().map(item->BeanUtil.copyProperties(item,SysUserVo.class));
-//        userVoIPage.setRecords(list);
-//
-//
-//        return   userVoIPage;
-//    }
     /**
-     * 分页
+     * 用户查询分页 并进行一下封装
      * @param sysUserPageParam
      * @return
      */
     @Override
     public IPage<SysUserVo> findUserList(SysUserPageParam sysUserPageParam) {
-        //旧方式不能连接多表
-//        //原分页对象
-//        IPage<SysUser> userPage = new Page<>();
-//        userPage.setPages(sysUserPageParam.getPageSize());
-//        userPage.setCurrent(sysUserPageParam.getCurrentPage());
-//        //构造用户表查询条件
+
+        Long currentPage = sysUserPageParam.getCurrentPage();
+        Long pageSize = sysUserPageParam.getPageSize();
+        //初始化
+        IPage<SysUserVo> userVoIPage = sysUserMapper.findUserList(new Page<SysUserVo>(currentPage,pageSize),sysUserPageParam);
+        //IPage<SysUser> temp = new Page<SysUser>(currentPage,pageSize);
+        //构造用户表查询条件
 //        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
-//        //用户名不为空就查用户名
+//        queryWrapper.lambda().eq(SysUser::getUserRoleId,sysUserPageParam.getUserRoleId());
+        //用户名不为空就查用户名
 //        String userName  = sysUserPageParam.getUserName();
-//        //要查询的用户id
-//        Integer userRoleId = sysUserPageParam.getUserRoleId();
-//        if(userRoleId != null){
-//            queryWrapper.lambda().eq(SysUser::getUserRoleId,userRoleId);
-//        }
 //        if(StringUtils.isNotEmpty(userName)){
 //            queryWrapper.lambda().like(SysUser::getUserName,userName);
 //        }
-//        return  this.baseMapper.selectPage(userPage,queryWrapper)
-//                .convert(item-> BeanUtil.copyProperties(item,SysUserVo.class));
-
-        IPage<SysUserVo> userVoIPage = new Page<>();
-        userVoIPage.setPages(sysUserPageParam.getPageSize());
-        userVoIPage.setCurrent(sysUserPageParam.getCurrentPage());
-        //sysUserPageParam.setPageLimit((sysUserPageParam.getCurrentPage()-1)*sysUserPageParam.getPageSize());
-        List<SysUserVo> totalList = sysUserMapper.findUserList(sysUserPageParam);
-        //开始
-        Long front = (sysUserPageParam.getCurrentPage()-1)*sysUserPageParam.getPageSize();
-        //结尾
-        Long end = Math.min(sysUserPageParam.getCurrentPage()*sysUserPageParam.getPageSize(),totalList.size());
-        List<SysUserVo> limitList = totalList.subList(front.intValue(),end.intValue());
-        System.out.println(limitList.toString());
-        //List<SysUserVo> newList = (List<SysUserVo>) list.stream().map(item->BeanUtil.copyProperties(item,SysUserVo.class));
-        userVoIPage.setRecords(limitList);
-        userVoIPage.setTotal(totalList.size());
-
-
-
+//        temp = sysUserMapper.selectPage(temp,queryWrapper);
+//        List<SysUserVo> limitList =  temp.getRecords().stream().map(item->BeanUtil.copyProperties(item,SysUserVo.class)).collect(Collectors.toList());
+//        userVoIPage.setRecords(limitList);
+//        userVoIPage.setTotal(temp.getTotal());
         return   userVoIPage;
     }
 

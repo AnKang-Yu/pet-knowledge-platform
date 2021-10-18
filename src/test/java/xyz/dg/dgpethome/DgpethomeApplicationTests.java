@@ -1,11 +1,17 @@
 package xyz.dg.dgpethome;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import xyz.dg.dgpethome.model.page.SysUserPageParam;
+import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.model.vo.CascaderSysDictVo;
+import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.service.SysDictService;
+import xyz.dg.dgpethome.service.SysUserService;
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.authority.SimpleGrantedAuthority;
 //import org.springframework.security.core.userdetails.UserDetails;
@@ -27,10 +33,44 @@ class DgpethomeApplicationTests {
 
     @Resource
     private SysDictService sysDictServiceImpl;
+
+    @Resource
+    private SysUserService sysUserServiceImpl;
+
+
     @Test
     public void testAllDict(){
         List<CascaderSysDictVo> test =  sysDictServiceImpl.findAllDictByParentId();
         System.out.println(test.toString());
+    }
+
+
+    /**
+     * 测试分页
+     */
+    @Test
+    public void testPageUser(){
+        IPage<SysUser> userPage = new Page<>(2, 10);//参数一是当前页，参数二是每页个数
+        userPage = sysUserServiceImpl.getBaseMapper().selectPage(userPage, null);
+        List<SysUser> list = userPage.getRecords();
+         for(SysUser user : list){
+                 System.out.println(user);
+             }
+    }
+
+    /**
+     * 测试分页2
+     */
+    @Test
+    public void testPageUser2(){
+        SysUserPageParam sysUserPageParam = new SysUserPageParam();
+        sysUserPageParam.setPageSize(10L);
+        sysUserPageParam.setCurrentPage(2L);
+
+        IPage<SysUserVo> iPage = sysUserServiceImpl.findUserList(sysUserPageParam);
+        for(SysUserVo i : iPage.getRecords()){
+            System.out.println(i.toString());
+        }
     }
 
     @Test
