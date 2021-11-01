@@ -15,15 +15,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SysDictPageParam {
-    /**
-     * 页容量
-     */
-    private Long pageSize;
-    /**
-     * 当前页
-     */
-    private Long currentPage;
+public class SysDictPageParam extends PageParam{
+
     /**
      * 字典表主键
      */

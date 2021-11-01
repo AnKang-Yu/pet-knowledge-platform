@@ -20,10 +20,11 @@ import xyz.dg.dgpethome.utils.JsonResultUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.*;
+import java.util.stream.Collectors;
+
 
 /**
  * @author Dugong
@@ -76,13 +77,17 @@ public class AdminController {
             tokenInfo.setLoginType(""+sysUser.getUserRoleId());
             Map<String, Object> data = new HashMap<>();
             data.put("token",tokenInfo.tokenValue);
+
+
             return JsonResultUtils.success("登录成功",data);
 
         } catch (Exception e) {
             e.printStackTrace();
             //return ResultData.error(ResultCode.ERROR, e.getMessage());
         }
+
         return JsonResultUtils.error("登录失败");
+
     }
 
     /**
@@ -100,9 +105,11 @@ public class AdminController {
         }
         SysUser sysUser = sysUserServiceImpl.getBaseMapper().selectById(userId);
         Map<String, Object> data = new HashMap<>();
+        List<Integer> list = new ArrayList<>();
+        list.add(sysUser.getUserRoleId());
         data.put("useraccount",sysUser.getUserAccount());
         data.put("username",sysUser.getUserName());
-        data.put("auth",sysUser.getUserRoleId());
+        data.put("roles", list);
         data.put("status",sysUser.getUserStatus());
         return JsonResultUtils.success("获取信息成功",data);
 

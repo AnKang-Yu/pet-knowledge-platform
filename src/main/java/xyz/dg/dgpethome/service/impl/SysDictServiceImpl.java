@@ -36,14 +36,14 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     @Override
     public IPage<SysDictVo> findDictList(SysDictPageParam sysDictPageParam){
-
+        // 取出前端传来的对象的值
         Long currentPage = sysDictPageParam.getCurrentPage();
         Long pageSize = sysDictPageParam.getPageSize();
-
-
+        // 字典分页
         IPage<SysDictVo> dictVoIPage = sysDictMapper.findDictList(new Page<SysDictVo>(currentPage,pageSize),sysDictPageParam);
 
         List<SysDictVo> totalList = dictVoIPage.getRecords();
+        // 如果找不到子字典，就把该字典找出来
         if(totalList == null || totalList.size()<1){
             LambdaQueryWrapper<SysDict> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             lambdaQueryWrapper
@@ -51,6 +51,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
             List<SysDictVo> temp = new ArrayList<>();
             temp.add(BeanUtil.copyProperties(this.baseMapper.selectOne(lambdaQueryWrapper),SysDictVo.class));
             dictVoIPage.setRecords(temp);
+            dictVoIPage.setTotal(temp.size());
         }
         return   dictVoIPage;
     }
@@ -66,6 +67,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         return list;
     }
 
+    /**
+     * 根据父字典ID查找所有该父字典底下的所有子字典
+     * @return
+     */
     @Override
     public List<CascaderSysDictVo>  findAllDictByParentId(){
         List<CascaderSysDictVo> list = new ArrayList<>();
@@ -97,6 +102,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                 CascaderSysDictVo temp =  new CascaderSysDictVo();
                 temp.setDictId(dictVo.getDictId());
                 temp.setDictValue(dictVo.getDictValue());
+                // 递归
                 temp.setList(getTreeDataLoop(dictVo.getDictId(),new ArrayList<>()));
                 result.add(temp);
             }

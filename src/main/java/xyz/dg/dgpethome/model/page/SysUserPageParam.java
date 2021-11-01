@@ -15,7 +15,7 @@ import xyz.dg.dgpethome.model.vo.SysUserVo;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SysUserPageParam {
+public class SysUserPageParam extends PageParam{
 
     /**
      * 用户名
@@ -29,14 +29,7 @@ public class SysUserPageParam {
      * 用户角色id父主键
      */
     private Integer dictParentId;
-    /**
-     * 页容量
-     */
-    private Long pageSize;
-    /**
-     * 当前页
-     */
-    private Long currentPage;
+
 //    /**
 //     * 从第几页数据开始拿
 //     */

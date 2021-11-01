@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.dg.dgpethome.mapper.BArticleMapper">
+  <resultMap id="BaseResultMap" type="xyz.dg.dgpethome.model.po.BArticle">
+    <!--@mbg.generated-->
+    <!--@Table b_article-->
+    <id column="article_id" jdbcType="BIGINT" property="articleId" />
+    <result column="article_authorId" jdbcType="INTEGER" property="articleAuthorid" />
+    <result column="article_authorName" jdbcType="VARCHAR" property="articleAuthorname" />
+    <result column="article_title" jdbcType="VARCHAR" property="articleTitle" />
+    <result column="article_summary" jdbcType="VARCHAR" property="articleSummary" />
+    <result column="article_original_content" jdbcType="LONGVARCHAR" property="articleOriginalContent" />
+    <result column="article_format_content" jdbcType="LONGVARCHAR" property="articleFormatContent" />
+    <result column="article_created" jdbcType="TIMESTAMP" property="articleCreated" />
+    <result column="article_modified" jdbcType="TIMESTAMP" property="articleModified" />
+    <result column="article_categoryId" jdbcType="INTEGER" property="articleCategoryid" />
+    <result column="article_allow_comment" jdbcType="INTEGER" property="articleAllowComment" />
+    <result column="article_thumbnail" jdbcType="VARCHAR" property="articleThumbnail" />
+    <result column="article_status" jdbcType="INTEGER" property="articleStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    article_id, article_authorId, article_authorName, article_title, article_summary, 
+    article_original_content, article_format_content, article_created, article_modified, 
+    article_categoryId, article_allow_comment, article_thumbnail, article_status
+  </sql>
+
+    <resultMap id="BaseResultMap_Vo" type="xyz.dg.dgpethome.model.vo.BArticleVo">
+        <!--@mbg.generated-->
+        <!--@Table b_article  sys_dict-->
+        <id column="article_id" jdbcType="BIGINT" property="articleId" />
+        <result column="article_authorName" jdbcType="VARCHAR" property="articleAuthorName" />
+        <result column="article_title" jdbcType="VARCHAR" property="articleTitle" />
+        <result column="article_modified" jdbcType="TIMESTAMP" property="articleModified" />
+        <result column="article_allow_comment" jdbcType="INTEGER" property="articleAllowComment" />
+        <result column="article_status" jdbcType="INTEGER" property="articleStatusId" />
+        <result column="article_categoryId" jdbcType="INTEGER" property="articleCategoryId" />
+        <result column="articleStatusName"  jdbcType="VARCHAR" property="articleStatusName" />
+        <result column="articleCategoryName"  jdbcType="VARCHAR" property="articleCategoryName" />
+        <collection property="articleTags" ofType="xyz.dg.dgpethome.model.vo.Tag" >
+            <result column="tag_id" jdbcType="INTEGER" property="tagId" />
+            <result column="tag_name"  jdbcType="VARCHAR" property="tagName" />
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List_Vo">
+    <!--@mbg.generated-->
+    ba.article_id, article_authorName, article_title,
+    article_modified,article_allow_comment, article_status,article_categoryId,
+    sd1.dict_value as articleStatusName,
+    sd2.dict_value as articleCategoryName,
+    tag_id, tag_name
+  </sql>
+
+    <select id="findArticleList" resultMap="BaseResultMap_Vo" parameterType="xyz.dg.dgpethome.model.page.BArticlePageParam">
+        SELECT
+        <include refid="Base_Column_List_Vo"/>
+        FROM `b_article` ba
+        JOIN `sys_dict` sd1 ON  ba.article_status = sd1.dict_id
+        JOIN `sys_dict` sd2 ON  ba.article_categoryId = sd2.dict_id
+        LEFT JOIN `b_article_tags` bt ON bt.article_id = ba.article_id
+        <where>
+            <choose>
+                <when test="bArticlePageParam.articleStatus != null">
+                    ba.article_status = #{bArticlePageParam.articleStatus}
+                </when>
+                <otherwise>
+                    ba.article_status between 93 and 97
+                </otherwise>
+            </choose>
+        </where>
+
+
+    </select>
+</mapper>
