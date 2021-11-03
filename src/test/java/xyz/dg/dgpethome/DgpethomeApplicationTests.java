@@ -10,6 +10,7 @@ import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.model.vo.CascaderSysDictVo;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
+import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.service.SysDictService;
 import xyz.dg.dgpethome.service.SysUserService;
 //import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class DgpethomeApplicationTests {
@@ -37,10 +39,12 @@ class DgpethomeApplicationTests {
     @Resource
     private SysUserService sysUserServiceImpl;
 
+    @Resource
+    private BArticleService bArticleServiceImpl;
 
     @Test
     public void testAllDict(){
-        List<CascaderSysDictVo> test =  sysDictServiceImpl.findAllDictByParentId();
+        List<CascaderSysDictVo> test =  sysDictServiceImpl.findAllDictByParentId(0);
         System.out.println(test.toString());
     }
 
@@ -87,7 +91,11 @@ class DgpethomeApplicationTests {
         System.out.println(SaSecureUtil.sha256("123456"));
         System.out.println("8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92".length());
     }
-
+    @Test
+    public void test_Category(){
+        List<Map<String , Object>> list = bArticleServiceImpl.findAllArticleCategoryList();
+        list.forEach(System.out::println);
+    }
 //    @Autowired
 //    JwtTokenUtil jwtTokenUtil;
 //

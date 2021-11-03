@@ -95,9 +95,13 @@ public class DictController {
         return JsonResultUtils.error("删除字典失败");
     }
 
+    /**
+     * 根据父Id字典值查其下的子字典
+     * @return JsonResult
+     */
     @GetMapping("/dict/findAllDictByParentId")
     public JsonResult findDictByParentId(){
         log.info("父Id查询方法: "  );
-        return JsonResultUtils.success("根据父Id查询字典成功",sysDictServiceImpl.findAllDictByParentId());
+        return JsonResultUtils.success("根据父Id查询字典成功",sysDictServiceImpl.findAllDictByParentId(0));
     }
 }

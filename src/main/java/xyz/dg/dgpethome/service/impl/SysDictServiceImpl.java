@@ -72,9 +72,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      * @return
      */
     @Override
-    public List<CascaderSysDictVo>  findAllDictByParentId(){
+    public List<CascaderSysDictVo>  findAllDictByParentId(Integer dictParentId){
         List<CascaderSysDictVo> list = new ArrayList<>();
-        return this.getTreeDataLoop(0,list);
+        // dictParentId = 0
+        return this.getTreeDataLoop(dictParentId,list);
     }
 
     /**

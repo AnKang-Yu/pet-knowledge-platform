@@ -108,6 +108,7 @@ public class AdminController {
         List<Integer> list = new ArrayList<>();
         list.add(sysUser.getUserRoleId());
         data.put("useraccount",sysUser.getUserAccount());
+        data.put("userId",sysUser.getUserId());
         data.put("username",sysUser.getUserName());
         data.put("roles", list);
         data.put("status",sysUser.getUserStatus());

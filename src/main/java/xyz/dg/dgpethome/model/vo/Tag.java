@@ -15,4 +15,6 @@ import lombok.NoArgsConstructor;
 public class Tag {
     private Integer tagId;
     private String tagName;
+    private Integer tagParentId;
+    private Integer tagGrandparentId;
 }

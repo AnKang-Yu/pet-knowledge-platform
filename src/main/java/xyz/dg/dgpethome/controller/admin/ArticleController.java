@@ -9,8 +9,10 @@ import xyz.dg.dgpethome.model.vo.BArticleVo;
 import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
-
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dugong
@@ -25,21 +27,72 @@ public class ArticleController {
     private BArticleService bArticleServiceImpl;
 
     /**
+     * 查询用于文章的所有分类方法
+     * @return
+     */
+    @GetMapping("/article/findAllArticleCategoryList")
+    public JsonResult<List<Map<String , Object>>> findAllArticleCategoryList(){
+        log.info("查询所有的文章分类");
+        List<Map<String , Object>> data = bArticleServiceImpl.findAllArticleCategoryList();
+        return JsonResultUtils.success("查询所有的文章分类成功",data);
+
+    }
+
+    /**
+     * 查询用于文章的所有标签方法
+     * @return
+     */
+    @GetMapping("/article/findAllTagsList")
+    public JsonResult findAllTagsList(){
+        log.info("查询用于文章的所有标签列表");
+        return JsonResultUtils.success("查询用于文章的标签列表",bArticleServiceImpl.findAllTagsList());
+
+    }
+
+    /**
      * 获取文章列表
      * @param bArticlePageParam
      * @return
      */
     @GetMapping("/article/findArticleList")
-    public JsonResult findArticleList(BArticlePageParam bArticlePageParam){
+    public JsonResult<IPage<BArticleVo>> findArticleList(BArticlePageParam bArticlePageParam){
         log.info("查找的文章参数: "+bArticlePageParam.toString());
         IPage<BArticleVo> articleList = bArticleServiceImpl.findArticleList(bArticlePageParam);
         return JsonResultUtils.success("查询成功",articleList);
     }
 
     /**
-     * 编辑文章
+     * 根据文章Id查询文章
+     * @param articleId
+     * @return JsonResult
+     */
+    @GetMapping("/article/findArticleById/{articleId}")
+    public JsonResult<BArticle> findArticleById(@PathVariable("articleId") Integer articleId){
+        log.info("查找的文章参数: "+articleId);
+        Map<String,Object> data = bArticleServiceImpl.findArticleById(articleId);
+        return JsonResultUtils.success("根据Id查询文章成功",data);
+    }
+
+    /**
+     * 新增文字方法
      * @param bArticle
      * @return
+     */
+    @PostMapping("/article/addArticle")
+    public JsonResult addArticle(@RequestBody BArticle bArticle){
+        log.info("执行新增文章方法" + bArticle.toString());
+        boolean rows = bArticleServiceImpl.save(bArticle);
+        if(rows){
+            //200
+            return JsonResultUtils.success("新增文章成功");
+        }
+        //500
+        return JsonResultUtils.error("新增文章失败");
+    }
+    /**
+     * 编辑文章
+     * @param bArticle 文章参数
+     * @return JsonResult
      */
     @PutMapping("/article/editArticle")
     public JsonResult editArticle(@RequestBody BArticle bArticle){
@@ -55,8 +108,8 @@ public class ArticleController {
 
     /**
      * 删除文章方法
-     * @param articleId
-     * @return
+     * @param articleId 待删除的文章Id
+     * @return JsonResult
      */
     @DeleteMapping("/article/deleteArticle/{articleId}")
     public JsonResult deleteArticle(@PathVariable("articleId") Integer articleId){
