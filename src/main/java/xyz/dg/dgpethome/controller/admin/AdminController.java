@@ -109,7 +109,7 @@ public class AdminController {
         list.add(sysUser.getUserRoleId());
         data.put("useraccount",sysUser.getUserAccount());
         data.put("userId",sysUser.getUserId());
-        data.put("username",sysUser.getUserName());
+        data.put("name",sysUser.getUserName());
         data.put("roles", list);
         data.put("status",sysUser.getUserStatus());
         return JsonResultUtils.success("获取信息成功",data);

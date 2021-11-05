@@ -1,16 +1,17 @@
 package xyz.dg.dgpethome.controller.admin;
 
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import xyz.dg.dgpethome.model.page.BArticlePageParam;
 import xyz.dg.dgpethome.model.po.BArticle;
+import xyz.dg.dgpethome.model.po.BArticlePlus;
 import xyz.dg.dgpethome.model.vo.BArticleVo;
 import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ import java.util.Map;
  **/
 @RestController
 @Slf4j
-public class ArticleController {
+public class BArticleController {
 
     @Resource
     private BArticleService bArticleServiceImpl;
@@ -74,14 +75,16 @@ public class ArticleController {
     }
 
     /**
-     * 新增文字方法
-     * @param bArticle
+     * 新增文章方法
+     * @param  @RequestBody BArticle bArticle , @RequestBody List<Integer> articleTags
      * @return
      */
     @PostMapping("/article/addArticle")
-    public JsonResult addArticle(@RequestBody BArticle bArticle){
-        log.info("执行新增文章方法" + bArticle.toString());
-        boolean rows = bArticleServiceImpl.save(bArticle);
+    public JsonResult addArticle(@RequestBody BArticlePlus bArticlePlus){
+        log.info("执行新增文章方法" + bArticlePlus.toString());
+        // log.info(bArticlePlus.getArticleTitle());
+//        log.info("标签列表" + articleTags);
+        boolean rows = bArticleServiceImpl.addArticle(bArticlePlus);
         if(rows){
             //200
             return JsonResultUtils.success("新增文章成功");
@@ -91,14 +94,14 @@ public class ArticleController {
     }
     /**
      * 编辑文章
-     * @param bArticle 文章参数
+     * @param bArticlePlus 文章参数
      * @return JsonResult
      */
     @PutMapping("/article/editArticle")
-    public JsonResult editArticle(@RequestBody BArticle bArticle){
-        log.info("执行编辑文章方法" + bArticle.toString());
-        boolean rows = bArticleServiceImpl.updateById(bArticle);
-        if(rows){
+    public JsonResult editArticle(@RequestBody BArticlePlus bArticlePlus){
+        log.info("执行编辑文章方法" + bArticlePlus.toString());
+        Integer rows = bArticleServiceImpl.editArticle(bArticlePlus);
+        if(rows > 0){
             //200
             return JsonResultUtils.success("编辑文章成功");
         }
@@ -115,15 +118,15 @@ public class ArticleController {
     public JsonResult deleteArticle(@PathVariable("articleId") Integer articleId){
         log.info("执行删除文章方法" + articleId);
         BArticle bArticle = bArticleServiceImpl.getById(articleId);
-        boolean rows = false;
+        Integer rows = 0;
         if(bArticle.getArticleStatus() == 97){
-            rows = bArticleServiceImpl.removeById(bArticle.getArticleId());
+            // 回收站的彻底删除
+            rows = bArticleServiceImpl.deleteArticle(articleId);
         }else{
             //影响行数
-            bArticle.setArticleStatus(97);
-            rows = bArticleServiceImpl.updateById(bArticle);
+            rows = bArticleServiceImpl.deleteToChangeArticleStatus(bArticle);
         }
-        if(rows){
+        if(rows > 0){
             //200
             return JsonResultUtils.success("删除字典成功");
         }

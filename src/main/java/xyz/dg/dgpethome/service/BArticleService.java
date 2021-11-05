@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.dg.dgpethome.model.page.BArticlePageParam;
 import xyz.dg.dgpethome.model.po.BArticle;
-import xyz.dg.dgpethome.model.po.SysDict;
+import xyz.dg.dgpethome.model.po.BArticlePlus;
 import xyz.dg.dgpethome.model.vo.BArticleVo;
 import xyz.dg.dgpethome.model.vo.CascaderSysDictVo;
-import xyz.dg.dgpethome.model.vo.Tag;
 
 import java.util.List;
 import java.util.Map;
@@ -44,4 +43,30 @@ public interface BArticleService extends IService<BArticle> {
      * @return
      */
     Map<String,Object> findArticleById(Integer articleId);
+
+    /**
+     * 添加文章方法
+     * @param
+     * @return
+     */
+    Boolean addArticle(BArticlePlus bArticlePlus);
+
+    /**
+     * 编辑文章方法
+     * @param bArticlePlus
+     * @return
+     */
+    Integer editArticle(BArticlePlus bArticlePlus);
+    /**
+     * 假删除，只是改变文章状态
+     * @param bArticle
+     * @return
+     */
+    Integer deleteToChangeArticleStatus(BArticle bArticle);
+    /**
+     * 删除文章方法
+     * @param articleId
+     * @return
+     */
+    Integer deleteArticle(Integer articleId);
 }

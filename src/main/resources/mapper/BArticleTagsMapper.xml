@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.dg.dgpethome.mapper.BArticleTagsMapper">
+  <resultMap id="BaseResultMap" type="xyz.dg.dgpethome.model.po.BArticleTags">
+    <!--@mbg.generated-->
+    <!--@Table b_article_tags-->
+    <id column="article_tags_id" jdbcType="BIGINT" property="articleTagsId" />
+    <result column="article_id" jdbcType="BIGINT" property="articleId" />
+    <result column="tag_id" jdbcType="INTEGER" property="tagId" />
+    <result column="tag_name" jdbcType="VARCHAR" property="tagName" />
+    <result column="tag_parent_id" jdbcType="INTEGER" property="tagParentId" />
+    <result column="tag_grandparent_id" jdbcType="INTEGER" property="tagGrandparentId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    article_tags_id, article_id, tag_id, tag_name, tag_parent_id, tag_grandparent_id
+  </sql>
+  <resultMap id="BaseResultMap_Vo" type="xyz.dg.dgpethome.model.vo.BArticleVo">
+      <collection property="articleTags" ofType="xyz.dg.dgpethome.model.po.BArticleTags" >
+                <result column="tag_id" jdbcType="INTEGER" property="tagId" />
+                <result column="tag_name"  jdbcType="VARCHAR" property="tagName" />
+            </collection>
+   </resultMap>
+
+
+<!--    <select id="selectArticleTagsByArticleIdBatch" resultMap="BaseResultMap_Vo">-->
+<!--        select bat.tag_id,bat.tag_name from b_article_tags bat-->
+<!--        where bat.article_id in-->
+<!--        <foreach collection="list" item="item" separator="," close=")" open="(">-->
+<!--          #{item.articleId,jdbcType=BIGINT}-->
+<!--        </foreach>-->
+
+<!--    </select>-->
+
+
+    <insert id="addArticleTagsByBatch" keyColumn="article_tags_id" keyProperty="articleTagsId" parameterType="map" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into b_article_tags
+    (article_id, tag_id, tag_name, tag_parent_id, tag_grandparent_id)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.articleId,jdbcType=BIGINT}, #{item.tagId,jdbcType=INTEGER}, #{item.tagName,jdbcType=VARCHAR},
+        #{item.tagParentId,jdbcType=INTEGER}, #{item.tagGrandparentId,jdbcType=INTEGER}
+        )
+    </foreach>
+  </insert>
+
+
+
+
+  <update id="updateBatch" parameterType="java.util.List">
+    <!--@mbg.generated-->
+    update b_article_tags
+    <trim prefix="set" suffixOverrides=",">
+      <trim prefix="article_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.articleId,jdbcType=BIGINT}
+        </foreach>
+      </trim>
+      <trim prefix="tag_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.tagId,jdbcType=INTEGER}
+        </foreach>
+      </trim>
+      <trim prefix="tag_name = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.tagName,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="tag_parent_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.tagParentId,jdbcType=INTEGER}
+        </foreach>
+      </trim>
+      <trim prefix="tag_grandparent_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.tagGrandparentId,jdbcType=INTEGER}
+        </foreach>
+      </trim>
+    </trim>
+    where article_tags_id in
+    <foreach close=")" collection="list" item="item" open="(" separator=", ">
+      #{item.articleTagsId,jdbcType=BIGINT}
+    </foreach>
+  </update>
+  <update id="updateBatchSelective" parameterType="java.util.List">
+    <!--@mbg.generated-->
+    update b_article_tags
+    <trim prefix="set" suffixOverrides=",">
+      <trim prefix="article_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.articleId != null">
+            when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.articleId,jdbcType=BIGINT}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="tag_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.tagId != null">
+            when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.tagId,jdbcType=INTEGER}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="tag_name = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.tagName != null">
+            when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.tagName,jdbcType=VARCHAR}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="tag_parent_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.tagParentId != null">
+            when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.tagParentId,jdbcType=INTEGER}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="tag_grandparent_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.tagGrandparentId != null">
+            when article_tags_id = #{item.articleTagsId,jdbcType=BIGINT} then #{item.tagGrandparentId,jdbcType=INTEGER}
+          </if>
+        </foreach>
+      </trim>
+    </trim>
+    where article_tags_id in
+    <foreach close=")" collection="list" item="item" open="(" separator=", ">
+      #{item.articleTagsId,jdbcType=BIGINT}
+    </foreach>
+  </update>
+
+</mapper>

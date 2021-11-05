@@ -25,10 +25,7 @@ import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SpringBootTest
 class DgpethomeApplicationTests {
@@ -93,8 +90,9 @@ class DgpethomeApplicationTests {
     }
     @Test
     public void test_Category(){
-        List<Map<String , Object>> list = bArticleServiceImpl.findAllArticleCategoryList();
-        list.forEach(System.out::println);
+//        List<Map<String , Object>> list = bArticleServiceImpl.findAllArticleCategoryList();
+//        list.forEach(System.out::println);
+        System.out.println(new Date());
     }
 //    @Autowired
 //    JwtTokenUtil jwtTokenUtil;

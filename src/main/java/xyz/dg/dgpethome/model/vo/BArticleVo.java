@@ -1,9 +1,13 @@
 package xyz.dg.dgpethome.model.vo;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import xyz.dg.dgpethome.model.po.BArticleTags;
 
 import java.util.Date;
 import java.util.List;
@@ -29,7 +33,9 @@ public class BArticleVo {
     /**
      * 文章修改时间
      */
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    //@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date articleModified;
     /**
      * 文章标题
@@ -49,7 +55,7 @@ public class BArticleVo {
      * 文章标签
      * 需要去文章标签表查找
      */
-    private List<Tag> articleTags;
+    private List<BArticleTags> articleTags;
     /**
      * 文章状态Id
      */

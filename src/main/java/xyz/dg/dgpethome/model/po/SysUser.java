@@ -3,9 +3,7 @@ package xyz.dg.dgpethome.model.po;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -89,6 +87,8 @@ public class SysUser implements Serializable {
     /**
     * 创建时间
     */
+    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
@@ -99,6 +99,8 @@ public class SysUser implements Serializable {
     /**
     * 修改时间
     */
+    //@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**

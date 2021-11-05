@@ -21,7 +21,7 @@
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     article_id, article_authorId, article_authorName, article_title, article_summary, 
-    article_original_content, article_format_content, article_created, article_modified, 
+    article_original_content, article_format_content, article_created, article_modified,
     article_categoryId, article_allow_comment, article_thumbnail, article_status
   </sql>
 
@@ -37,38 +37,131 @@
         <result column="article_categoryId" jdbcType="INTEGER" property="articleCategoryId" />
         <result column="articleStatusName"  jdbcType="VARCHAR" property="articleStatusName" />
         <result column="articleCategoryName"  jdbcType="VARCHAR" property="articleCategoryName" />
-        <collection property="articleTags" ofType="xyz.dg.dgpethome.model.vo.Tag" >
-            <result column="tag_id" jdbcType="INTEGER" property="tagId" />
-            <result column="tag_name"  jdbcType="VARCHAR" property="tagName" />
-        </collection>
+<!--        <collection property="articleTags" ofType="xyz.dg.dgpethome.model.po.BArticleTags" >-->
+<!--            <result column="tag_id" jdbcType="INTEGER" property="tagId" />-->
+<!--            <result column="tag_name"  jdbcType="VARCHAR" property="tagName" />-->
+<!--        </collection>-->
     </resultMap>
     <sql id="Base_Column_List_Vo">
     <!--@mbg.generated-->
     ba.article_id, article_authorName, article_title,
     article_modified,article_allow_comment, article_status,article_categoryId,
     sd1.dict_value as articleStatusName,
-    sd2.dict_value as articleCategoryName,
-    tag_id, tag_name
+    sd2.dict_value as articleCategoryName
+<!--    tag_id , tag_name-->
   </sql>
 
+<!--  根据文章状态查询  -->
     <select id="findArticleList" resultMap="BaseResultMap_Vo" parameterType="xyz.dg.dgpethome.model.page.BArticlePageParam">
         SELECT
         <include refid="Base_Column_List_Vo"/>
         FROM `b_article` ba
         JOIN `sys_dict` sd1 ON  ba.article_status = sd1.dict_id
         JOIN `sys_dict` sd2 ON  ba.article_categoryId = sd2.dict_id
-        LEFT JOIN `b_article_tags` bt ON bt.article_id = ba.article_id
         <where>
+            ba.article_status
             <choose>
                 <when test="bArticlePageParam.articleStatus != null">
-                    ba.article_status = #{bArticlePageParam.articleStatus}
+                     = #{bArticlePageParam.articleStatus}
                 </when>
                 <otherwise>
-                    ba.article_status between 93 and 97
+                     between 93 and 97
                 </otherwise>
             </choose>
         </where>
 
 
     </select>
+    <!-- 新增文章记录并返回文章Id    -->
+    <insert id="addArticle" parameterType="xyz.dg.dgpethome.model.po.BArticlePlus">
+        <!--selectKey  会将 SELECT LAST_INSERT_ID()的结果放入到传入的BArticlePlus的主键里面，
+        keyProperty 对应的model中的主键的属性名，这里是 user 中的id，因为它跟数据库的主键对应
+        order AFTER 表示 SELECT LAST_INSERT_ID() 在insert执行之后执行,多用与自增主键，
+              BEFORE 表示 SELECT LAST_INSERT_ID() 在insert执行之前执行，这样的话就拿不到主键了，
+                    这种适合那种主键不是自增的类型
+        resultType 主键类型 -->
+        <selectKey keyProperty="articleId" order="AFTER" resultType="java.lang.Long">
+			select LAST_INSERT_ID()
+		</selectKey>
+		insert into `b_article`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+          <if test="articleAuthorid != null">
+            article_authorId,
+          </if>
+          <if test="articleAuthorname != null">
+            article_authorName,
+          </if>
+          <if test="articleTitle != null">
+            article_title,
+          </if>
+          <if test="articleSummary != null">
+            article_summary,
+          </if>
+          <if test="articleOriginalContent != null">
+            article_original_content,
+          </if>
+          <if test="articleFormatContent != null">
+            article_format_content,
+          </if>
+<!--          <if test="articleCreated != null">-->
+<!--            article_created,-->
+<!--          </if>-->
+<!--          <if test="articleModified != null">-->
+<!--            article_modified,-->
+<!--          </if>-->
+          <if test="articleCategoryid != null">
+            article_categoryId,
+          </if>
+          <if test="articleAllowComment != null">
+            article_allow_comment,
+          </if>
+          <if test="articleThumbnail != null">
+            article_thumbnail,
+          </if>
+          <if test="articleStatus != null">
+            article_status,
+          </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+          <if test="articleAuthorid != null">
+            #{articleAuthorid,jdbcType=INTEGER},
+          </if>
+          <if test="articleAuthorname != null">
+            #{articleAuthorname,jdbcType=VARCHAR},
+          </if>
+          <if test="articleTitle != null">
+            #{articleTitle,jdbcType=VARCHAR},
+          </if>
+          <if test="articleSummary != null">
+            #{articleSummary,jdbcType=VARCHAR},
+          </if>
+          <if test="articleOriginalContent != null">
+            #{articleOriginalContent,jdbcType=LONGVARCHAR},
+          </if>
+          <if test="articleFormatContent != null">
+            #{articleFormatContent,jdbcType=LONGVARCHAR},
+          </if>
+<!--          <if test="articleCreated != null">-->
+<!--            #{articleCreated,jdbcType=TIMESTAMP},-->
+<!--          </if>-->
+<!--          <if test="articleModified != null">-->
+<!--            #{articleModified,jdbcType=TIMESTAMP},-->
+<!--          </if>-->
+          <if test="articleCategoryid != null">
+            #{articleCategoryid,jdbcType=INTEGER},
+          </if>
+          <if test="articleAllowComment != null">
+            #{articleAllowComment,jdbcType=INTEGER},
+          </if>
+          <if test="articleThumbnail != null">
+            #{articleThumbnail,jdbcType=VARCHAR},
+          </if>
+          <if test="articleStatus != null">
+            #{articleStatus,jdbcType=INTEGER},
+          </if>
+        </trim>
+    </insert>
+
+
+
 </mapper>
