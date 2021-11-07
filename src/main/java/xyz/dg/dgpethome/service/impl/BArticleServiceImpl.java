@@ -4,9 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
+import org.springframework.web.multipart.MultipartFile;
 import xyz.dg.dgpethome.mapper.BArticleTagsMapper;
 import xyz.dg.dgpethome.mapper.SysDictMapper;
 import xyz.dg.dgpethome.model.page.BArticlePageParam;
@@ -17,6 +20,8 @@ import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.service.BArticleTagsService;
 import xyz.dg.dgpethome.service.SysDictService;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +34,7 @@ import java.util.stream.Collectors;
  * @description
  **/
 @Service
+@Slf4j
 public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> implements BArticleService {
 
     @Resource
@@ -47,6 +53,8 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
      */
     private static Integer ALLSTATUS = 5;
 
+    @Value("${upload.rootDir}")
+    private  String uploadFilePath ;
     /**
      * 查询用于文章的所有分类方法
      * @return
@@ -97,13 +105,19 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
      * @return
      */
     @Override
-    public Boolean addArticle(BArticlePlus bArticlePlus) {
+    public Boolean addArticle(MultipartFile file,BArticlePlus bArticlePlus) throws IOException {
         // 所有的新增文章都把状态设置成待审核 94
         bArticlePlus.setArticleStatus(ARTICLESTATUS);
-        System.out.println(bArticlePlus);
+        //System.out.println(bArticlePlus);
         // 添加文章影响的行数number
         Long number = this.bArticleMapper.addArticle(bArticlePlus);
-        System.out.println("articleId: "+bArticlePlus.getArticleId());
+        // System.out.println("articleId: "+bArticlePlus.getArticleId());
+        // 有就添加封面
+        if(upload(file,bArticlePlus.getArticleId())){
+            String thumbnail = uploadFilePath+'/'+"article_"+bArticlePlus.getArticleId()+'/'+"articleThumbnail"+".jpg";
+            bArticlePlus.setArticleThumbnail(thumbnail);
+            this.bArticleMapper.updateById(bArticlePlus);
+        }
         // 添加文章的标签进文章标签表
         Boolean tagsFlag = addArticleTags(bArticlePlus.getArticleTags(),bArticlePlus.getArticleId());
         // Integer articleStatus = sysDictMapper.selectOne(new LambdaQueryWrapper<SysDict>().select(SysDict::getDictId).eq(SysDict::getDictValue,"待审核")).getDictId();
@@ -158,19 +172,44 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
      * @return
      */
     @Override
-    public  Integer editArticle(BArticlePlus bArticlePlus){
+    public  Integer editArticle(MultipartFile file,BArticlePlus bArticlePlus) throws IOException {
         // 编辑后的文章统一得审核 94
         bArticlePlus.setArticleStatus(ARTICLESTATUS);
+        // 设置对应的文章的封面图片路径
+        // System.out.println(uploadFilePath);
+        // 更新封面
+        if(upload(file,bArticlePlus.getArticleId())){
+            // 有更新
+            String thumbnail = uploadFilePath+'/'+"article_"+bArticlePlus.getArticleId()+'/'+"articleThumbnail"+".jpg";
+            bArticlePlus.setArticleThumbnail(thumbnail);
+        }
+        //
         Integer number = this.bArticleMapper.updateById(bArticlePlus);
         // 删除文章对应的标签
         this.bArticleTagsMapper.delete(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,bArticlePlus.getArticleId()));
+        // 重新添加回去标签
         Boolean tagsFlag = addArticleTags(bArticlePlus.getArticleTags(),bArticlePlus.getArticleId());
+
         if(number <= 0 || tagsFlag == false){
             return 0;
         }
         return number;
     }
-
+    private Boolean upload(MultipartFile file,Long articleId) throws IOException {
+        Boolean flag = false;
+        if(file != null){
+            String thumbnail = uploadFilePath+'/'+"article_"+articleId+'/'+"articleThumbnail"+".jpg";
+            log.info("文章封面更改了");
+            // String fileName = file.getOriginalFilename();
+            File dest = new File(thumbnail);
+            if(!dest.getParentFile().exists()){
+                dest.getParentFile().mkdirs();
+            }
+            file.transferTo(dest);
+            flag = true;
+        }
+        return flag;
+    }
     /**
      * 假删除，只是改变文章状态
      * @param bArticle

@@ -1,9 +1,11 @@
 package xyz.dg.dgpethome.controller.admin;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import xyz.dg.dgpethome.model.page.BArticlePageParam;
 import xyz.dg.dgpethome.model.po.BArticle;
 import xyz.dg.dgpethome.model.po.BArticlePlus;
@@ -12,6 +14,7 @@ import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -80,11 +83,12 @@ public class BArticleController {
      * @return
      */
     @PostMapping("/article/addArticle")
-    public JsonResult addArticle(@RequestBody BArticlePlus bArticlePlus){
+    public JsonResult addArticle(@RequestParam(required = false,name = "file") MultipartFile file, @RequestPart(name = "articleData") BArticlePlus bArticlePlus) throws IOException {
         log.info("执行新增文章方法" + bArticlePlus.toString());
+        // log.info("文件:" + file.getOriginalFilename());
         // log.info(bArticlePlus.getArticleTitle());
 //        log.info("标签列表" + articleTags);
-        boolean rows = bArticleServiceImpl.addArticle(bArticlePlus);
+        boolean rows = bArticleServiceImpl.addArticle(file,bArticlePlus);
         if(rows){
             //200
             return JsonResultUtils.success("新增文章成功");
@@ -94,19 +98,22 @@ public class BArticleController {
     }
     /**
      * 编辑文章
-     * @param bArticlePlus 文章参数
+     * @param
      * @return JsonResult
      */
-    @PutMapping("/article/editArticle")
-    public JsonResult editArticle(@RequestBody BArticlePlus bArticlePlus){
+    @PostMapping("/article/editArticle")
+    public JsonResult editArticle(@RequestParam(required = false,name = "file") MultipartFile file, @RequestPart(name = "articleData") BArticlePlus bArticlePlus) throws IOException {
+        log.info("文件:" + file.getOriginalFilename());
+        //BArticlePlus bArticlePlus = JSONObject.parseObject(dto, BArticlePlus.class);
         log.info("执行编辑文章方法" + bArticlePlus.toString());
-        Integer rows = bArticleServiceImpl.editArticle(bArticlePlus);
+        Integer rows = bArticleServiceImpl.editArticle(file,bArticlePlus);
         if(rows > 0){
             //200
             return JsonResultUtils.success("编辑文章成功");
         }
         //500
         return JsonResultUtils.error("编辑文章失败");
+        // return JsonResultUtils.success("编辑文章成功");
     }
 
     /**

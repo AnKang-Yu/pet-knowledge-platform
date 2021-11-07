@@ -3,6 +3,7 @@ package xyz.dg.dgpethome;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,7 @@ import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.service.SysDictService;
 import xyz.dg.dgpethome.service.SysUserService;
+import xyz.dg.dgpethome.utils.FilesUtils;
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.authority.SimpleGrantedAuthority;
 //import org.springframework.security.core.userdetails.UserDetails;
@@ -22,12 +24,15 @@ import xyz.dg.dgpethome.service.SysUserService;
 
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @SpringBootTest
+@Slf4j
 class DgpethomeApplicationTests {
 
     @Resource
@@ -93,6 +98,14 @@ class DgpethomeApplicationTests {
 //        List<Map<String , Object>> list = bArticleServiceImpl.findAllArticleCategoryList();
 //        list.forEach(System.out::println);
         System.out.println(new Date());
+    }
+
+    @Test
+    public  void tttt() throws IOException {
+        String path = "D:/tmp/images/article_1/articleThumbnail.jpg";
+        byte[] aa = new FilesUtils().getFile(path);
+
+        log.info("" + aa.length);
     }
 //    @Autowired
 //    JwtTokenUtil jwtTokenUtil;

@@ -2,12 +2,14 @@ package xyz.dg.dgpethome.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 import xyz.dg.dgpethome.model.page.BArticlePageParam;
 import xyz.dg.dgpethome.model.po.BArticle;
 import xyz.dg.dgpethome.model.po.BArticlePlus;
 import xyz.dg.dgpethome.model.vo.BArticleVo;
 import xyz.dg.dgpethome.model.vo.CascaderSysDictVo;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -49,14 +51,14 @@ public interface BArticleService extends IService<BArticle> {
      * @param
      * @return
      */
-    Boolean addArticle(BArticlePlus bArticlePlus);
+    Boolean addArticle(MultipartFile file,BArticlePlus bArticlePlus) throws IOException;
 
     /**
      * 编辑文章方法
      * @param bArticlePlus
      * @return
      */
-    Integer editArticle(BArticlePlus bArticlePlus);
+    Integer editArticle(MultipartFile file,BArticlePlus bArticlePlus) throws IOException;
     /**
      * 假删除，只是改变文章状态
      * @param bArticle
