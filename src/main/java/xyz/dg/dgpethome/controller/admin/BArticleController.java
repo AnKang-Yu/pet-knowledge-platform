@@ -78,6 +78,23 @@ public class BArticleController {
     }
 
     /**
+     * 保存草稿
+     * @param bArticle
+     * @return
+     */
+    @PostMapping("/article/saveDraft")
+    public JsonResult saveDraft(@RequestBody BArticle bArticle){
+        log.info("新增文章草稿"+  bArticle.toString());
+        boolean rows = this.bArticleServiceImpl.save(bArticle);
+        if(rows){
+            //200
+            return JsonResultUtils.success("保存草稿成功");
+        }
+        //500
+        return JsonResultUtils.error("保存草稿失败");
+    }
+
+    /**
      * 新增文章方法
      * @param  @RequestBody BArticle bArticle , @RequestBody List<Integer> articleTags
      * @return
@@ -103,7 +120,7 @@ public class BArticleController {
      */
     @PostMapping("/article/editArticle")
     public JsonResult editArticle(@RequestParam(required = false,name = "file") MultipartFile file, @RequestPart(name = "articleData") BArticlePlus bArticlePlus) throws IOException {
-        log.info("文件:" + file.getOriginalFilename());
+        // log.info("文件:" + file.getOriginalFilename());
         //BArticlePlus bArticlePlus = JSONObject.parseObject(dto, BArticlePlus.class);
         log.info("执行编辑文章方法" + bArticlePlus.toString());
         Integer rows = bArticleServiceImpl.editArticle(file,bArticlePlus);
@@ -135,10 +152,10 @@ public class BArticleController {
         }
         if(rows > 0){
             //200
-            return JsonResultUtils.success("删除字典成功");
+            return JsonResultUtils.success("删除文章成功");
         }
         //500
-        return JsonResultUtils.error("删除字典失败");
+        return JsonResultUtils.error("删除文章失败");
     }
 
 }

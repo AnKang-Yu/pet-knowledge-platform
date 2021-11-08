@@ -106,15 +106,18 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
      */
     @Override
     public Boolean addArticle(MultipartFile file,BArticlePlus bArticlePlus) throws IOException {
-        // 所有的新增文章都把状态设置成待审核 94
-        bArticlePlus.setArticleStatus(ARTICLESTATUS);
+        // 所有的新增文章如果状态为空就把状态设置成待审核 94
+        // 有状态的话应该是草稿 93
+        if(bArticlePlus.getArticleStatus() == null){
+            bArticlePlus.setArticleStatus(ARTICLESTATUS);
+        }
         //System.out.println(bArticlePlus);
         // 添加文章影响的行数number
         Long number = this.bArticleMapper.addArticle(bArticlePlus);
         // System.out.println("articleId: "+bArticlePlus.getArticleId());
         // 有就添加封面
         if(upload(file,bArticlePlus.getArticleId())){
-            String thumbnail = uploadFilePath+'/'+"article_"+bArticlePlus.getArticleId()+'/'+"articleThumbnail"+".jpg";
+            String thumbnail = uploadFilePath+"/article/"+"article_"+bArticlePlus.getArticleId()+'/'+"articleThumbnail"+".jpg";
             bArticlePlus.setArticleThumbnail(thumbnail);
             this.bArticleMapper.updateById(bArticlePlus);
         }
@@ -180,7 +183,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         // 更新封面
         if(upload(file,bArticlePlus.getArticleId())){
             // 有更新
-            String thumbnail = uploadFilePath+'/'+"article_"+bArticlePlus.getArticleId()+'/'+"articleThumbnail"+".jpg";
+            String thumbnail = uploadFilePath+"/article/"+"article_"+bArticlePlus.getArticleId()+'/'+"articleThumbnail"+".jpg";
             bArticlePlus.setArticleThumbnail(thumbnail);
         }
         //
@@ -198,7 +201,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     private Boolean upload(MultipartFile file,Long articleId) throws IOException {
         Boolean flag = false;
         if(file != null){
-            String thumbnail = uploadFilePath+'/'+"article_"+articleId+'/'+"articleThumbnail"+".jpg";
+            String thumbnail = uploadFilePath+"/article/"+"article_"+articleId+'/'+"articleThumbnail"+".jpg";
             log.info("文章封面更改了");
             // String fileName = file.getOriginalFilename();
             File dest = new File(thumbnail);
@@ -263,42 +266,6 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         System.out.println("根据文章id查的标签列表: "+data);
         return data;
     }
-//    private  List<BArticleTags> findTagByParentId(Integer tagParentId , List<BArticleTags> allTagList){
-//        List<BArticleTags> result = new ArrayList<>();
-//        List<BArticleTags> temp = allTagList;
-//        for(BArticleTags tag : temp.stream().filter(item->item.getTagParentId().equals(tagParentId)).collect(Collectors.toList())){
-//           result.add(tag);
-//        }
-//        // System.out.println(result);
-//        return result;
-//    }
-//    private List<CascaderSysDictVo> fillData(List<CascaderSysDictVo> data,List<BArticleTags> allTagList,Integer parentId){
-//          List<BArticleTags> temp = this.findTagByParentId(parentId,allTagList);
-//          if(temp == null || temp.size() < 1) {
-//                return null;
-//          }
-//          List<CascaderSysDictVo> result = new ArrayList<>();
-//
-//          for (BArticleTags tag : temp) {
-//                // 如果id是父级的话就放入tree中
-//                CascaderSysDictVo cascaderSysDictVo =  new CascaderSysDictVo();
-//                cascaderSysDictVo.setDictId(tag.getTagId());
-//                cascaderSysDictVo.setDictValue(tag.getTagName());
-//                // 递归
-//                cascaderSysDictVo.setList(fillData(new ArrayList<>(),allTagList,tag.getTagId()));
-//                result.add(cascaderSysDictVo);
-//          }
-//        return result;
-////        List<BArticleTags> temp = list;
-////        for( BArticleTags tag : temp.stream().filter(item->item.getTagTier().equals(tier)).collect(Collectors.toList())){
-////            CascaderSysDictVo cascaderSysDictVo = new CascaderSysDictVo();
-////            cascaderSysDictVo.setDictId(tag.getTagId());
-////            cascaderSysDictVo.setDictValue(tag.getTagName());
-////            cascaderSysDictVo.setList(fillData(new ArrayList<>(),list,tier+1,tag.getTagId()));
-////
-////        }
-//    }
-
 
     /**
      * 根据文章状态查找文章
@@ -314,11 +281,11 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         IPage<BArticleVo> bArticleVoIPage = bArticleMapper.findArticleList(new Page<BArticleVo>(currentPage,pageSize),bArticlePageParam);
 
         List<BArticleVo> records = bArticleVoIPage.getRecords();
-        System.out.println(records);
+        // System.out.println(records);
         for(BArticleVo bArticleVo : records){
             bArticleVo.setArticleTags(this.bArticleTagsMapper.selectList(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,bArticleVo.getArticleId())));
         }
-        System.out.println(records);
+        // System.out.println(records);
         bArticleVoIPage.setRecords(records);
 //        System.out.println("标签前: "+records);
 //        List<BArticleVo> news = this.bArticleTagsMapper.selectArticleTagsByArticleIdBatch(records);

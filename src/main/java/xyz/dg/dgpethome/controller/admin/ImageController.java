@@ -25,19 +25,16 @@ public class ImageController {
 
     /**
      * 查找图片
-     * @param articleThumbnail
-     * @return
+     * @param url
      * @throws IOException
      */
     @GetMapping("/showImage")
-    public JsonResult showImage(String articleThumbnail) throws IOException {
-        log.info("查找的图路径: "+articleThumbnail);
-        if(articleThumbnail != null){
-            //String thumbnail = "D:\\tmp\\images\\"+"article_"+articleId+'/'+"articleThumbnail"+".jpg";
-            byte[] data =  new FilesUtils().getFile(articleThumbnail);
-            //log.info("data；.");
+    public JsonResult showImage(String url) throws IOException {
+        log.info("查找的图路径: "+url);
+        if(url != null && url.length()>0){
+            byte[] data =  new FilesUtils().getFile(url);
             return JsonResultUtils.success("图片",data);
         }
-        return JsonResultUtils.error("无图片啦");
+        return JsonResultUtils.error("无图片啦",50000,null);
     }
 }

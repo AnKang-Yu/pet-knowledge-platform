@@ -107,6 +107,13 @@ class DgpethomeApplicationTests {
 
         log.info("" + aa.length);
     }
+    @Test
+    public void a(){
+        String secret ="";
+        String guess = "";
+        int index = 1;
+
+    }
 //    @Autowired
 //    JwtTokenUtil jwtTokenUtil;
 //

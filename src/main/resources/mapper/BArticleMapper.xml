@@ -57,7 +57,7 @@
         <include refid="Base_Column_List_Vo"/>
         FROM `b_article` ba
         JOIN `sys_dict` sd1 ON  ba.article_status = sd1.dict_id
-        JOIN `sys_dict` sd2 ON  ba.article_categoryId = sd2.dict_id
+        LEFT JOIN `sys_dict` sd2 ON  ba.article_categoryId = sd2.dict_id
         <where>
             ba.article_status
             <choose>

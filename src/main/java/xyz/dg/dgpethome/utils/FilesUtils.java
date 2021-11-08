@@ -12,11 +12,14 @@ import java.io.IOException;
 public class FilesUtils {
     public byte[] getFile(String path) throws IOException {
         File file = new File(path);
-        FileInputStream inputStream = new FileInputStream(file);
-        byte[] bytes = new byte[inputStream.available()];
-        inputStream.read(bytes, 0, inputStream.available());
-        inputStream.close();
-        return bytes;
+        if(file.exists()){
+            FileInputStream inputStream = new FileInputStream(file);
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes, 0, inputStream.available());
+            inputStream.close();
+            return bytes;
+        }
+        return null;
     }
 
     public boolean judgeFileExists(String path) {
