@@ -66,7 +66,6 @@ public class SysUser implements Serializable {
     /**
     * 用户生日
     */
-    @JsonFormat(pattern="yyyy-MM-dd")
     private Date userBirthday;
 
     /**
