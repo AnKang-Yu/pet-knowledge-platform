@@ -8,7 +8,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -18,6 +21,7 @@ import javax.naming.AuthenticationException;
 import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.mapper.SysUserMapper;
+import xyz.dg.dgpethome.model.vo.SysDictVo;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 import xyz.dg.dgpethome.service.SysUserService;
@@ -31,6 +35,7 @@ import java.util.stream.Collectors;
  * @description
  **/
 @Service
+@Slf4j
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> implements SysUserService {
 
 //    @Autowired
@@ -39,6 +44,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
     private  SysUserMapper sysUserMapper;
     //用户状态   字典里id是31
     private static final Integer USER_STATE = 31;
+
+    /**
+     * redis缓存
+     */
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 通过账号查询用户
      * @param userName
@@ -46,13 +57,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
      */
     @Override
     public SysUser getUserByUserUsername(String userName) {
-        LambdaQueryWrapper<SysUser> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        //查询条件：全匹配用户名，和状态为1的账号
-        lambdaQueryWrapper
-                .eq(SysUser::getUserName,userName);
-                //.eq(SysUser::getUserStatus,USER_STATE);
-        //用getOne查询一个对象出来
-        SysUser user = this.baseMapper.selectOne(lambdaQueryWrapper);
+        SysUser user = null;
+        Object o = redisTemplate.opsForValue().get("userName_"+userName);
+        if(o!=null){
+            //缓存中有数据
+            log.info("读取到redis缓存userName_"+userName);
+            user=(SysUser)o;
+        }else{
+            // 缓存中没有，就进入数据库查询
+            LambdaQueryWrapper<SysUser> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            //查询条件：全匹配用户名，和状态为1的账号
+            lambdaQueryWrapper
+                    .eq(SysUser::getUserName,userName);
+            //.eq(SysUser::getUserStatus,USER_STATE);
+            //用getOne查询一个对象出来
+            user  = this.baseMapper.selectOne(lambdaQueryWrapper);
+            if(user!=null){
+                log.info("redis缓存了userName_"+userName);
+                redisTemplate.opsForValue().set("userName_"+userName ,user);
+            }
+        }
         return  user;
     }
 

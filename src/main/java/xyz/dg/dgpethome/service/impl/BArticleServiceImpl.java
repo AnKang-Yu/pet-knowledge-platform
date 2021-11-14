@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
@@ -58,14 +60,18 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     private  String uploadFilePath ;
 
     /**
+     * redis缓存
+     */
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    /**
      * 查询用于文章的所有分类方法
      * @return
      */
     @Override
-    public  List<Map<String , Object>>  findAllArticleCategoryList(){
-        LambdaQueryWrapper<SysDict> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.select(SysDict::getDictId,SysDict::getDictValue).eq(SysDict::getDictParentId,4);
-        List<Map<String , Object>> data = this.sysDictServiceImpl.getBaseMapper().selectMaps(lambdaQueryWrapper);
+    public  List<SysDictVo>  findAllArticleCategoryList(){
+        List<SysDictVo> data = this.sysDictServiceImpl.findDictByParentId(4);
         return data;
     }
 
@@ -76,11 +82,22 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     @Override
     public   List<CascaderSysDictVo> findAllTagsList(){
         // 只找 2和6底下的字典用于文章 分别是动物大科和性别
-        List<CascaderSysDictVo> data = this.sysDictServiceImpl.findAllDictByParentId(0);
-        List<CascaderSysDictVo> result = data.stream().filter(item->item.getDictId().equals(2)||item.getDictId().equals(6)).collect(Collectors.toList());
-//        data.addAll(this.sysDictServiceImpl.findAllDictByParentId(2)) ;
-//        data.addAll(this.sysDictServiceImpl.findAllDictByParentId(6)) ;
-        System.out.println("用于文章的标签: "+result.toString());
+        List<CascaderSysDictVo> result = null;
+        // 用于文章标签的缓存
+        Object o = redisTemplate.opsForValue().get("CascaderDictVoListToUseArticle");
+        if(o!=null){
+            //缓存中有数据
+            log.info("读取到redis缓存CascaderDictVoListToUseArticle");
+            result=(List<CascaderSysDictVo>) o;
+        }else{
+            // 缓存中没有，就进入数据库查询
+            List<CascaderSysDictVo> data = this.sysDictServiceImpl.findAllDictByParentId(0);
+            result = data.stream().filter(item->item.getDictId().equals(2)||item.getDictId().equals(6)).collect(Collectors.toList());
+            if(result!=null){
+                log.info("redis缓存了CascaderDictVoListToUseArticle");
+                redisTemplate.opsForValue().set("CascaderDictVoListToUseArticle" ,result);
+            }
+        }
         return result;
     }
 

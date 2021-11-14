@@ -8,6 +8,7 @@ import xyz.dg.dgpethome.model.po.BArticle;
 import xyz.dg.dgpethome.model.po.BArticlePlus;
 import xyz.dg.dgpethome.model.vo.BArticleVo;
 import xyz.dg.dgpethome.model.vo.CascaderSysDictVo;
+import xyz.dg.dgpethome.model.vo.SysDictVo;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,7 +32,7 @@ public interface BArticleService extends IService<BArticle> {
      * @param
      * @return
      */
-    List<Map<String , Object>>  findAllArticleCategoryList();
+    List<SysDictVo>  findAllArticleCategoryList();
 
     /**
      * 查询用于文章的标签字典列表

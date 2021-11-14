@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.dg.dgpethome.model.page.BArticlePageParam;
+import xyz.dg.dgpethome.model.page.SysDictPageParam;
 import xyz.dg.dgpethome.model.po.BArticle;
 import xyz.dg.dgpethome.model.po.BArticlePlus;
 import xyz.dg.dgpethome.model.vo.BArticleVo;
+import xyz.dg.dgpethome.model.vo.SysDictVo;
 import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
@@ -37,7 +39,7 @@ public class BArticleController {
     @GetMapping("/article/findAllArticleCategoryList")
     public JsonResult<List<Map<String , Object>>> findAllArticleCategoryList(){
         log.info("查询所有的文章分类");
-        List<Map<String , Object>> data = bArticleServiceImpl.findAllArticleCategoryList();
+        List<SysDictVo> data = bArticleServiceImpl.findAllArticleCategoryList();
         return JsonResultUtils.success("查询所有的文章分类成功",data);
 
     }

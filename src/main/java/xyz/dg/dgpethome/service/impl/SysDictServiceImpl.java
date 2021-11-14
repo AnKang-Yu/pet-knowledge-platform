@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -25,7 +28,14 @@ import xyz.dg.dgpethome.service.SysDictService;
  * @description
  **/
 @Service
+@Slf4j
 public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> implements SysDictService{
+
+    /**
+     * redis缓存
+     */
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Resource
     private SysDictMapper sysDictMapper;
@@ -63,7 +73,20 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     @Override
     public  List<SysDictVo>  findDictByParentId(Integer dictParentId){
-        List<SysDictVo> list = sysDictMapper.findDictByParentId(dictParentId);
+        List<SysDictVo> list = null;
+        Object o = redisTemplate.opsForValue().get("SysDictVoListByParentId_"+dictParentId);
+        if(o!=null){
+            //缓存中有数据
+            log.info("读取到redis缓存SysDictVoListByParentId_"+dictParentId);
+            list=(List<SysDictVo>)o;
+        }else{
+            // 缓存中没有，就进入数据库查询
+            list = sysDictMapper.findDictByParentId(dictParentId);
+            if(list!=null){
+                log.info("redis缓存了SysDictVoListByParentId_"+dictParentId);
+                redisTemplate.opsForValue().set("SysDictVoListByParentId_"+dictParentId ,list);
+            }
+        }
         return list;
     }
 
@@ -73,11 +96,23 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     @Override
     public List<CascaderSysDictVo>  findAllDictByParentId(Integer dictParentId){
-        List<CascaderSysDictVo> list = new ArrayList<>();
+        List<CascaderSysDictVo> list = null;
+        Object o = redisTemplate.opsForValue().get("CascaderAllDictVoListByParentId_"+dictParentId);
+        if(o!=null){
+            //缓存中有数据
+            log.info("读取到redis缓存CascaderAllDictVoListByParentId_"+dictParentId);
+            list=(List<CascaderSysDictVo>)o;
+        }else{
+            // 缓存中没有，就进入数据库查询
+            list = this.getTreeDataLoop(dictParentId,new ArrayList<>());
+            if(list!=null){
+                log.info("redis缓存了CascaderAllDictVoListByParentId_"+dictParentId);
+                redisTemplate.opsForValue().set("CascaderAllDictVoListByParentId_"+dictParentId ,list);
+            }
+        }
         // dictParentId = 0
-        return this.getTreeDataLoop(dictParentId,list);
+        return list;
     }
-
     /**
      * 递归查找字典
      * @param dictParentId
@@ -86,7 +121,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     private List<CascaderSysDictVo> getTreeDataLoop(Integer dictParentId,List<CascaderSysDictVo> tree) {
         // 获取父字典下所有的字典数据
-        List<SysDictVo> dictTree = this.findDictByParentId(dictParentId);
+        List<SysDictVo> dictTree = this.findDictByParentIdNoRedis(dictParentId);
         // 判断子级是否还有子级
         if (dictTree == null || dictTree.size() < 1) {
             // 如果没有子级则返回空
@@ -108,5 +143,9 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                 result.add(temp);
             }
         return result;
+    }
+    private  List<SysDictVo>  findDictByParentIdNoRedis(Integer dictParentId){
+        List<SysDictVo> list =  sysDictMapper.findDictByParentId(dictParentId);
+        return list;
     }
 }
