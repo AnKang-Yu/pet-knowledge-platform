@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.dg.dgpethome.mapper.BRescueApplicationFormMapper">
+  <resultMap id="BaseResultMap" type="xyz.dg.dgpethome.model.po.BRescueApplicationForm">
+    <!--@mbg.generated-->
+    <!--@Table b_rescue_application_form-->
+    <id column="form_id" jdbcType="BIGINT" property="formId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="target_id" jdbcType="INTEGER" property="targetId" />
+    <result column="pet_id" jdbcType="BIGINT" property="petId" />
+    <result column="form_type" jdbcType="INTEGER" property="formType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="form_remark" jdbcType="VARCHAR" property="formRemark" />
+    <result column="auditor_id" jdbcType="INTEGER" property="auditorId" />
+    <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime" />
+    <result column="audit_opinion" jdbcType="VARCHAR" property="auditOpinion" />
+    <result column="form_status" jdbcType="INTEGER" property="formStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    form_id, user_id, target_id, pet_id, form_type, create_time, update_time, form_remark,
+    auditor_id, audit_time, audit_opinion, form_status
+  </sql>
+  <resultMap id="BaseResultMapVo" type="xyz.dg.dgpethome.model.vo.BRescueApplicationFormVo">
+    <!--@mbg.generated-->
+    <!--@Table b_article_application_form-->
+    <id column="form_id" jdbcType="BIGINT" property="formId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="target_id" jdbcType="INTEGER" property="targetId" />
+    <result column="pet_id" jdbcType="BIGINT" property="petId" />
+    <result column="form_type" jdbcType="INTEGER" property="formType" />
+    <result column="form_type_name" jdbcType="INTEGER" property="formTypeName" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="auditor_id" jdbcType="INTEGER" property="auditorId" />
+    <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime" />
+    <result column="form_status" jdbcType="INTEGER" property="formStatus" />
+    <result column="form_status_name" jdbcType="VARCHAR" property="formStatusName"/>
+  </resultMap>
+  <sql id="Base_Column_List_Vo">
+    <!--@mbg.generated-->
+    form_id, user_id, pet_id, target_id, form_type,sd1.dict_value as form_type_name,update_time,  auditor_id,
+    audit_time, form_status,  sd2.dict_value as form_status_name
+  </sql>
+
+  <select id="findRescueApplicationFormList" resultMap="BaseResultMapVo" parameterType="xyz.dg.dgpethome.model.page.ApplicationFormParam">
+        SELECT <include refid="Base_Column_List_Vo"/> FROM `b_rescue_application_form` braf
+        JOIN `sys_dict` sd1 ON braf.form_type = sd1.dict_id
+        LEFT JOIN `sys_dict` sd2 ON braf.form_status = sd2.dict_id
+        <where>
+            <if test="applicationFormParam.formStatus != null">
+                braf.form_status = #{applicationFormParam.formStatus}
+            </if>
+        </where>
+        ORDER BY braf.form_status
+    </select>
+</mapper>

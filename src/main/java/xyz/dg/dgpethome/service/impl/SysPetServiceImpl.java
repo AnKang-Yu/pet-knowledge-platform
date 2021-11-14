@@ -59,4 +59,9 @@ public class SysPetServiceImpl extends ServiceImpl<SysPetMapper, SysPet> impleme
         List<SysDictVo>  data = this.sysDictServiceImpl.findDictByParentId(7);
         return data;
     }
+
+    @Override
+    public SysPetVo findPetById(Long petId) {
+        return this.sysPetMapper.findPetById(petId);
+    }
 }

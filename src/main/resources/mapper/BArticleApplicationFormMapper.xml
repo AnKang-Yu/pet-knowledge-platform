@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.dg.dgpethome.mapper.BArticleApplicationFormMapper">
+  <resultMap id="BaseResultMap" type="xyz.dg.dgpethome.model.po.BArticleApplicationForm">
+    <!--@mbg.generated-->
+    <!--@Table b_article_application_form-->
+    <id column="form_id" jdbcType="BIGINT" property="formId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="article_id" jdbcType="BIGINT" property="articleId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="form_remark" jdbcType="VARCHAR" property="formRemark" />
+    <result column="auditor_id" jdbcType="INTEGER" property="auditorId" />
+    <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime" />
+    <result column="audit_opinion" jdbcType="VARCHAR" property="auditOpinion" />
+    <result column="form_status" jdbcType="INTEGER" property="formStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    form_id, user_id, article_id, create_time, update_time, form_remark, auditor_id,
+    audit_time, audit_opinion, form_status
+  </sql>
+
+  <resultMap id="BaseResultMapVo" type="xyz.dg.dgpethome.model.vo.BArticleApplicationFormVo">
+    <!--@mbg.generated-->
+    <!--@Table b_article_application_form-->
+    <id column="form_id" jdbcType="BIGINT" property="formId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="article_id" jdbcType="BIGINT" property="articleId" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="auditor_id" jdbcType="INTEGER" property="auditorId" />
+    <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime" />
+    <result column="form_status" jdbcType="INTEGER" property="formStatus" />
+    <result column="form_status_name" jdbcType="VARCHAR" property="formStatusName"/>
+  </resultMap>
+  <sql id="Base_Column_List_Vo">
+    <!--@mbg.generated-->
+    form_id, user_id, article_id, update_time,  auditor_id,
+    audit_time, form_status, sd.dict_value as form_status_name
+  </sql>
+
+  <update id="updateFormStatusById" >
+        UPDATE  `b_article_application_form`
+        <set>
+            form_status = 106
+        </set>
+        <where>
+            form_id = #{formId,jdbcType=BIGINT}
+        </where>
+    </update>
+
+    <select id="findArticleApplicationForm" resultMap="BaseResultMapVo" parameterType="xyz.dg.dgpethome.model.page.ApplicationFormParam">
+        SELECT <include refid="Base_Column_List_Vo"/> FROM `b_article_application_form` baaf
+        LEFT JOIN `sys_dict` sd ON baaf.form_status = sd.dict_id
+        <where>
+            <if test="applicationFormParam.formStatus != null">
+                baaf.form_status = #{applicationFormParam.formStatus}
+            </if>
+        </where>
+        ORDER BY baaf.form_status
+    </select>
+  </mapper>

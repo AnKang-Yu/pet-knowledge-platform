@@ -16,6 +16,7 @@ import xyz.dg.dgpethome.model.page.BArticlePageParam;
 import xyz.dg.dgpethome.model.po.*;
 import xyz.dg.dgpethome.mapper.BArticleMapper;
 import xyz.dg.dgpethome.model.vo.*;
+import xyz.dg.dgpethome.service.BArticleApplicationFormService;
 import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.service.BArticleTagsService;
 import xyz.dg.dgpethome.service.SysDictService;
@@ -41,13 +42,13 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     private BArticleMapper bArticleMapper;
 
     @Resource
-    private SysDictMapper sysDictMapper;
-
-    @Resource
     private SysDictService sysDictServiceImpl;
 
     @Resource
-    private BArticleTagsMapper bArticleTagsMapper;
+    private BArticleTagsService bArticleTagsServiceImpl;
+
+    @Resource
+    private BArticleApplicationFormService bArticleApplicationFormServiceImpl;
     /**
      * 文章状态字典码为5
      */
@@ -55,6 +56,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
 
     @Value("${upload.rootDir}")
     private  String uploadFilePath ;
+
     /**
      * 查询用于文章的所有分类方法
      * @return
@@ -63,7 +65,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     public  List<Map<String , Object>>  findAllArticleCategoryList(){
         LambdaQueryWrapper<SysDict> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.select(SysDict::getDictId,SysDict::getDictValue).eq(SysDict::getDictParentId,4);
-        List<Map<String , Object>> data = this.sysDictMapper.selectMaps(lambdaQueryWrapper);
+        List<Map<String , Object>> data = this.sysDictServiceImpl.getBaseMapper().selectMaps(lambdaQueryWrapper);
         return data;
     }
 
@@ -98,6 +100,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         map.put("articleTags",data);
         return map;
     }
+    // 待审核标志
     private static Integer ARTICLESTATUS = 94;
     /**
      * 添加文章方法
@@ -126,6 +129,14 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         // Integer articleStatus = sysDictMapper.selectOne(new LambdaQueryWrapper<SysDict>().select(SysDict::getDictId).eq(SysDict::getDictValue,"待审核")).getDictId();
         // Boolean row = this.save(bArticle);
 
+        // 添加文章审核,状态为待审核的文章都添加申请表单进去
+        if(bArticlePlus.getArticleStatus().equals(ARTICLESTATUS) ){
+            BArticleApplicationForm  bArticleApplicationForm =new BArticleApplicationForm(bArticlePlus.getArticleId());
+            bArticleApplicationForm.setUserId(bArticlePlus.getArticleAuthorid());
+            // 103正在审批
+            bArticleApplicationForm.setFormStatus(103);
+            bArticleApplicationFormServiceImpl.save(bArticleApplicationForm);
+        }
         if(number <= 0 || tagsFlag == false){
             return false;
         }
@@ -154,7 +165,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
                 case 2: tag.setTagParentId(list.get(len-2));
                 case 1:
                     tag.setTagId(list.get(len-1));
-                    tag.setTagName(this.sysDictMapper.selectById(tag.getTagId()).getDictValue());
+                    tag.setTagName(this.sysDictServiceImpl.getBaseMapper().selectById(tag.getTagId()).getDictValue());
             }
             if(tag.getTagGrandparentId()== null){
                 tag.setTagGrandparentId(0);
@@ -162,7 +173,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
             tagsList.add(tag);
         }
         // 批量插入
-        Integer rows = this.bArticleTagsMapper.addArticleTagsByBatch(tagsList);
+        Integer rows = this.bArticleTagsServiceImpl.addArticleTagsByBatch(tagsList);
         if(rows <= 0){
             tagsFlag = false;
         }
@@ -189,9 +200,19 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         //
         Integer number = this.bArticleMapper.updateById(bArticlePlus);
         // 删除文章对应的标签
-        this.bArticleTagsMapper.delete(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,bArticlePlus.getArticleId()));
+        this.bArticleTagsServiceImpl.getBaseMapper().delete(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,bArticlePlus.getArticleId()));
         // 重新添加回去标签
         Boolean tagsFlag = addArticleTags(bArticlePlus.getArticleTags(),bArticlePlus.getArticleId());
+
+        // 审核的
+        BArticleApplicationForm  bArticleApplicationForm =new BArticleApplicationForm(bArticlePlus.getArticleId());
+        bArticleApplicationForm.setUserId(bArticlePlus.getArticleAuthorid());
+        // 103正在审批
+        bArticleApplicationForm.setFormStatus(103);
+        // 把之前的正在审批的请求置为失效
+        changeBArticleFormStatus(bArticleApplicationForm);
+        bArticleApplicationFormServiceImpl.save(bArticleApplicationForm);
+
 
         if(number <= 0 || tagsFlag == false){
             return 0;
@@ -213,6 +234,26 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         }
         return flag;
     }
+
+    /**
+     * 编辑文章，删除文章的时候把处于文章审批状态的申请请求置为失效
+     */
+    private void changeBArticleFormStatus(BArticleApplicationForm  bArticleApplicationForm){
+
+
+        LambdaQueryWrapper<BArticleApplicationForm> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.select(BArticleApplicationForm::getFormId)
+                .eq(BArticleApplicationForm::getArticleId,bArticleApplicationForm.getArticleId())
+                .eq(BArticleApplicationForm::getUserId,bArticleApplicationForm.getUserId())
+                .eq(BArticleApplicationForm::getFormStatus,bArticleApplicationForm.getFormStatus())
+                .orderByDesc(BArticleApplicationForm::getUpdateTime);
+
+        List<BArticleApplicationForm> result =bArticleApplicationFormServiceImpl.getBaseMapper().selectList(lambdaQueryWrapper);
+        if(result.size() > 0){
+            Long formId = result.get(0).getFormId();
+            bArticleApplicationFormServiceImpl.updateFormStatusById(formId);
+        }
+    }
     /**
      * 假删除，只是改变文章状态
      * @param bArticle
@@ -222,8 +263,20 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     public Integer deleteToChangeArticleStatus(BArticle bArticle) {
         // 变更为回收站
         bArticle.setArticleStatus(97);
-        return this.bArticleMapper.updateById(bArticle);
+        // 文章审核
+        BArticleApplicationForm  bArticleApplicationForm =new BArticleApplicationForm(bArticle.getArticleId());
+        bArticleApplicationForm.setUserId(bArticle.getArticleAuthorid());
+        // 103正在审批
+        bArticleApplicationForm.setFormStatus(103);
+        changeBArticleFormStatus(bArticleApplicationForm);
+
+
+        // 把之前的正在审批的请求置为失效
+        changeBArticleFormStatus(bArticleApplicationForm);
+        return this.bArticleMapper.changeArticleStatusById(bArticle.getArticleId(),bArticle.getArticleStatus());
     }
+
+
 
     /**
      * 真的删除文章
@@ -235,7 +288,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         // 删除文章
         Integer rows = this.bArticleMapper.deleteById(articleId);
         // 删除文章对应的标签
-        this.bArticleTagsMapper.delete(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,articleId));
+        this.bArticleTagsServiceImpl.getBaseMapper().delete(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,articleId));
 
         return rows;
     }
@@ -251,7 +304,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         lambdaQueryWrapper.select(BArticleTags::getTagId,BArticleTags::getTagName,BArticleTags::getTagParentId,BArticleTags::getTagGrandparentId)
                 .eq(BArticleTags::getArticleId,articleId);
 
-        List<BArticleTags> allTagList = this.bArticleTagsMapper.selectList(lambdaQueryWrapper);
+        List<BArticleTags> allTagList = this.bArticleTagsServiceImpl.getBaseMapper().selectList(lambdaQueryWrapper);
 
         List<List<Integer>> data =   new ArrayList<>();
         for(BArticleTags tag : allTagList){
@@ -283,27 +336,10 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         List<BArticleVo> records = bArticleVoIPage.getRecords();
         // System.out.println(records);
         for(BArticleVo bArticleVo : records){
-            bArticleVo.setArticleTags(this.bArticleTagsMapper.selectList(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,bArticleVo.getArticleId())));
+            bArticleVo.setArticleTags(this.bArticleTagsServiceImpl.getBaseMapper().selectList(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,bArticleVo.getArticleId())));
         }
         // System.out.println(records);
         bArticleVoIPage.setRecords(records);
-//        System.out.println("标签前: "+records);
-//        List<BArticleVo> news = this.bArticleTagsMapper.selectArticleTagsByArticleIdBatch(records);
-//        System.out.println("标签后records: "+records);
-//        System.out.println("标签后news: "+news);
-//        bArticleVoIPage.setRecords(news);
-
-
-//        LambdaQueryWrapper<BArticle> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-//        if(bArticlePageParam.getArticleStatus()==null){
-//            List<Integer> list = this.findAllArticleStatusCode(ALLSTATUS);
-//            lambdaQueryWrapper.in(BArticle::getArticleStatus,list);
-//        }
-//        lambdaQueryWrapper.eq(BArticle::getArticleStatus,bArticlePageParam.getArticleStatus());
-//        IPage<BArticle> bArticleVoIPage = this.bArticleMapper.selectPage(new Page<BArticle>(bArticlePageParam.getCurrentPage(),bArticlePageParam.getPageSize()),lambdaQueryWrapper);
-//        System.out.println("原先的条数: "+bArticleVoIPage.getTotal());
-//        bArticleVoIPage.setTotal(bArticleVoIPage.getRecords().size());
-//        System.out.println("现在的条数: "+bArticleVoIPage.getTotal());
         return bArticleVoIPage;
     }
 
@@ -320,7 +356,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
 //          <p>注意： 只返回第一个字段的值</p>
 //          @param queryWrapper 实体对象封装操作类（可以为 null）
         // List<Integer> list = this.sysDictMapper.selectObjs(lambdaQueryWrapper);
-        List<Integer> list = this.sysDictMapper.selectList(lambdaQueryWrapper).stream().mapToInt(SysDict::getDictId).boxed().collect(Collectors.toList());
+        List<Integer> list = this.sysDictServiceImpl.getBaseMapper().selectList(lambdaQueryWrapper).stream().mapToInt(SysDict::getDictId).boxed().collect(Collectors.toList());
         System.out.println("文章状态码: "+list);
         return list;
     }

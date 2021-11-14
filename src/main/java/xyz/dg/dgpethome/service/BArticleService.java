@@ -71,4 +71,11 @@ public interface BArticleService extends IService<BArticle> {
      * @return
      */
     Integer deleteArticle(Integer articleId);
+
+    /**
+     * 更改文章状态
+     * @param articleId
+     * @param statusCode
+     * @return
+     */
 }

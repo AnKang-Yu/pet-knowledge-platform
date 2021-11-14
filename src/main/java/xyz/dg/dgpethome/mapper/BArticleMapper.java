@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import xyz.dg.dgpethome.model.page.BArticlePageParam;
 import xyz.dg.dgpethome.model.po.BArticle;
 import xyz.dg.dgpethome.model.po.BArticlePlus;
@@ -42,6 +43,15 @@ public interface BArticleMapper extends BaseMapper<BArticle> {
      * @return
      */
     Long addArticle(BArticlePlus bArticlePlus);
+
+    /**
+     * 根据文章id改文章状态
+     * @param articleId
+     * @param statusCode
+     * @return
+     */
+    @Update("UPDATE `b_article` SET `article_status` = #{statusCode} WHERE `article_id` = #{articleId}")
+    Integer changeArticleStatusById(Long articleId, Integer statusCode);
 
 
 }

@@ -29,6 +29,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         // log.info("当前时间:------------"+new Date());
+        this.setFieldValByName("auditTime",new Date(),metaObject);
         this.setFieldValByName("updateTime",new Date(),metaObject);
         this.setFieldValByName("articleModified",new Date(),metaObject);
     }

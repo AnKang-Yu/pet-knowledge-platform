@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import xyz.dg.dgpethome.model.page.SysPetPageParam;
+import xyz.dg.dgpethome.model.po.BArticle;
 import xyz.dg.dgpethome.model.po.SysDict;
 import xyz.dg.dgpethome.model.po.SysPet;
 import xyz.dg.dgpethome.model.vo.SysPetVo;
@@ -12,6 +13,7 @@ import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * @author Dugong
@@ -52,6 +54,12 @@ public class PetController {
         return JsonResultUtils.success("查询宠物状态列表成功",sysPetServiceImpl.findAllStatusList());
     }
 
+    @GetMapping("/pet/findPetById/{petId}")
+    public JsonResult<SysPetVo> findPetById(@PathVariable("petId") Long petId){
+        log.info("查找的文章参数: "+petId);
+        SysPetVo data = sysPetServiceImpl.findPetById(petId);
+        return JsonResultUtils.success("根据Id查询文章成功",data);
+    }
     /**
      * 添加宠物
      * @param sysPet
@@ -69,12 +77,12 @@ public class PetController {
         return JsonResultUtils.error("新增宠物失败");
     }
     /**
-     * 编辑字典
+     * 编辑宠物
      * @param sysPet
      * @return
      */
     @PutMapping("/pet/editPet")
-    public JsonResult editDict(@RequestBody SysPet sysPet){
+    public JsonResult editPet(@RequestBody SysPet sysPet){
         log.info("执行编辑宠物方法");
         boolean rows = sysPetServiceImpl.updateById(sysPet);
         if(rows){

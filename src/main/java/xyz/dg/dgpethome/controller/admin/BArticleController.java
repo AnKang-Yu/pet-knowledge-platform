@@ -84,8 +84,16 @@ public class BArticleController {
      */
     @PostMapping("/article/saveDraft")
     public JsonResult saveDraft(@RequestBody BArticle bArticle){
-        log.info("新增文章草稿"+  bArticle.toString());
-        boolean rows = this.bArticleServiceImpl.save(bArticle);
+        log.info("文章草稿"+  bArticle.toString());
+        boolean rows = false;
+        if(bArticle.getArticleId() == null){
+            //第一次草稿
+             rows = this.bArticleServiceImpl.save(bArticle);
+        }else{
+            // 之后的草稿
+             rows = this.bArticleServiceImpl.updateById(bArticle);
+        }
+
         if(rows){
             //200
             return JsonResultUtils.success("保存草稿成功");

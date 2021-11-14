@@ -59,4 +59,15 @@
         </if>
      </where>
   </select>
+
+
+  <select id="findPetById" resultMap="BaseResultMap_Vo" parameterType="Long">
+    SELECT <include refid="Base_Column_List_Vo" />
+    <!--    LEFT JOIN sys_dict sd ON sp.pet_variety_id = sd.dict_id-->
+        FROM `sys_pet` sp  JOIN `sys_dict` sd1 ON sp.pet_variety_id = sd1.dict_id
+        LEFT JOIN `sys_dict` sd2 ON sp.pet_status_id = sd2.dict_id
+        <where>
+            sp.pet_id = #{petId,jdbcType=BIGINT}
+        </where>
+    </select>
 </mapper>

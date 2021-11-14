@@ -37,4 +37,6 @@ public interface SysPetService extends IService<SysPet> {
      */
     List<SysDictVo>  findAllStatusList();
 
+    SysPetVo findPetById(Long petId);
+
 }
