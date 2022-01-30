@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author Dugong
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 public class SysDictPageParam extends PageParam{
 
     /**

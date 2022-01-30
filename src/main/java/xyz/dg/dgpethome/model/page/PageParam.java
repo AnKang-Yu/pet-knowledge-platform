@@ -12,7 +12,7 @@ public class PageParam {
     /**
      * 页容量
      */
-    private Long pageSize;
+    private Long pageSize = 10L;
     /**
      * 当前页
      */

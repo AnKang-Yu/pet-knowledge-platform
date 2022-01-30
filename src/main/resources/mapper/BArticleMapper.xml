@@ -42,6 +42,9 @@
 <!--            <result column="tag_name"  jdbcType="VARCHAR" property="tagName" />-->
 <!--        </collection>-->
     </resultMap>
+
+
+
     <sql id="Base_Column_List_Vo">
     <!--@mbg.generated-->
     ba.article_id, article_authorName, article_title,
@@ -59,18 +62,35 @@
         JOIN `sys_dict` sd1 ON  ba.article_status = sd1.dict_id
         LEFT JOIN `sys_dict` sd2 ON  ba.article_categoryId = sd2.dict_id
         <where>
-            ba.article_status
-            <choose>
-                <when test="bArticlePageParam.articleStatus != null">
-                     = #{bArticlePageParam.articleStatus}
+            <if test="bArticlePageParam.articleCategoryid != null">
+                article_categoryId = #{bArticlePageParam.articleCategoryid}  AND
+           </if>
+
+
+            <if test="bArticlePageParam.articleStatus != null">
+                article_status = #{bArticlePageParam.articleStatus}
+            </if>
+        </where>
+    </select>
+     <select id="getPersonalArticleList" resultMap="BaseResultMap_Vo">
+        SELECT
+        <include refid="Base_Column_List_Vo"/>
+        FROM `b_article` ba
+        JOIN `sys_dict` sd1 ON  ba.article_status = sd1.dict_id
+        LEFT JOIN `sys_dict` sd2 ON  ba.article_categoryId = sd2.dict_id
+        <where>
+            <if test="userId != null">
+                article_authorId = #{userId}
+           </if>
+           <choose>
+                <when test="articleStatusId != null">
+                   AND article_status in (#{articleStatusId}, 95)
                 </when>
                 <otherwise>
-                     between 93 and 97
+                   AND article_status in (94,96,97)
                 </otherwise>
             </choose>
         </where>
-
-
     </select>
     <!-- 新增文章记录并返回文章Id    -->
     <insert id="addArticle" parameterType="xyz.dg.dgpethome.model.po.BArticlePlus">
@@ -161,7 +181,4 @@
           </if>
         </trim>
     </insert>
-
-
-
 </mapper>

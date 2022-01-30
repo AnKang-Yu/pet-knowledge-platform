@@ -64,6 +64,10 @@ public class SysPet implements Serializable {
      * 宠物照片
      */
     private String petAvatar;
+    /**
+     * 宠物锁定状态(0-未锁定，1已锁定)
+     */
+    private Boolean petLockState;
 
     private static final long serialVersionUID = 1L;
 }

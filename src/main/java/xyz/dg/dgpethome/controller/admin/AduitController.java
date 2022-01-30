@@ -81,6 +81,7 @@ public class AduitController {
     public JsonResult editSuccourApplicationFormSuccess(@RequestBody BRescueApplicationForm bRescueApplicationForm){
         log.info("执行编辑救助申请单审核通过方法"+bRescueApplicationForm.toString());
         boolean rows = bRescueApplicationFormServiceImpl.editSuccourApplicationFormSuccess(bRescueApplicationForm);
+
         if(rows){
             //200
             return JsonResultUtils.success("编辑救助申请单审核通过成功");

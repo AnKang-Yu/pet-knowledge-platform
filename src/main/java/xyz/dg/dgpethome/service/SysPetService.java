@@ -39,4 +39,6 @@ public interface SysPetService extends IService<SysPet> {
 
     SysPetVo findPetById(Long petId);
 
+    Integer lockPetState(Long petId);
+
 }

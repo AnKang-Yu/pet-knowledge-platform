@@ -73,7 +73,7 @@ public class BArticleController {
      * @return JsonResult
      */
     @GetMapping("/article/findArticleById/{articleId}")
-    public JsonResult<BArticle> findArticleById(@PathVariable("articleId") Integer articleId){
+    public JsonResult<BArticle> findArticleById(@PathVariable("articleId") Long articleId){
         log.info("查找的文章参数: "+articleId);
         Map<String,Object> data = bArticleServiceImpl.findArticleById(articleId);
         return JsonResultUtils.success("根据Id查询文章成功",data);

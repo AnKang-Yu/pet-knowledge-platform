@@ -53,5 +53,5 @@ public interface BArticleMapper extends BaseMapper<BArticle> {
     @Update("UPDATE `b_article` SET `article_status` = #{statusCode} WHERE `article_id` = #{articleId}")
     Integer changeArticleStatusById(Long articleId, Integer statusCode);
 
-
+    List<BArticleVo> getPersonalArticleList(@Param("articleStatusId")Integer articleStatusId, @Param("userId") Integer userId);
 }

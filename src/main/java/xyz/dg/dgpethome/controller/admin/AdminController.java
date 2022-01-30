@@ -68,6 +68,8 @@ public class AdminController {
         //拿对应的用户账户名和密码
         String username =  loginInfo.get("username");
         String password =  loginInfo.get("password");
+        log.info("用户名"+username);
+        log.info("密码"+password);
         try {
             //验证登录信息
             SysUser sysUser = sysUserServiceImpl.checkLogin(username,password);
@@ -76,6 +78,7 @@ public class AdminController {
             SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
             tokenInfo.setLoginType(""+sysUser.getUserRoleId());
             Map<String, Object> data = new HashMap<>();
+            log.info("token: "+tokenInfo.tokenValue);
             data.put("token",tokenInfo.tokenValue);
 
 
@@ -113,7 +116,6 @@ public class AdminController {
         data.put("roles", list);
         data.put("status",sysUser.getUserStatus());
         return JsonResultUtils.success("获取信息成功",data);
-
     }
     @PostMapping("/admin/logout")
     public JsonResult logout() {

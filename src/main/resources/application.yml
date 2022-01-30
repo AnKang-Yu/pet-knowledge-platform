@@ -8,8 +8,8 @@ spring:
       max-request-size: 15MB
 
   profiles:
-    include: jdbc
- # ,mail,redis
+    include: jdbc,redis
+ # ,mail
   devtools:
     restart:
       enabled: false
@@ -47,7 +47,7 @@ sa-token:
   # token名称 (同时也是cookie名称)
   token-name: Authorization
   # token有效期，设置为24min,单位s 默认30天, -1代表永不过期
-  timeout: 1440
+  timeout: 14400
   # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
   activity-timeout: -1
   # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)

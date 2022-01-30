@@ -1,6 +1,7 @@
 package xyz.dg.dgpethome.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -50,5 +51,10 @@ public interface SysUserService extends IService<SysUser> {
 
     //IPage<SysUserVo> testPage(SysUserPageParam sysUserPageParam);
 
-
+    /**
+     * 对用户进行数据脱敏后返回
+     * @param sysUser
+     * @return
+     */
+    Map<String, Object> dataMaskUserInfo(SysUser sysUser);
 }

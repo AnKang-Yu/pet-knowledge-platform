@@ -1,5 +1,6 @@
 package xyz.dg.dgpethome.controller.admin;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -29,6 +31,7 @@ public class PetController {
 
     @GetMapping("/pet/findPetList")
     public JsonResult findPetList(SysPetPageParam sysPetPageParam){
+
         log.info("查找的宠物参数: "+sysPetPageParam.toString());
         IPage<SysPetVo> petList = sysPetServiceImpl.findPetList(sysPetPageParam);
         return JsonResultUtils.success("查询成功",petList);
@@ -56,9 +59,9 @@ public class PetController {
 
     @GetMapping("/pet/findPetById/{petId}")
     public JsonResult<SysPetVo> findPetById(@PathVariable("petId") Long petId){
-        log.info("查找的文章参数: "+petId);
+        log.info("查找的宠物参数: "+petId);
         SysPetVo data = sysPetServiceImpl.findPetById(petId);
-        return JsonResultUtils.success("根据Id查询文章成功",data);
+        return JsonResultUtils.success("根据Id查询宠物成功",data);
     }
     /**
      * 添加宠物

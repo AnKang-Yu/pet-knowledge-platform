@@ -42,6 +42,10 @@ public class BRescueApplicationFormVo {
      */
     private String formTypeName;
     /**
+     * 创建时间
+     */
+    private Date createTime;
+    /**
      * 修改时间
      */
     private Date updateTime;

@@ -82,6 +82,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     @Override
     public   List<CascaderSysDictVo> findAllTagsList(){
         // 只找 2和6底下的字典用于文章 分别是动物大科和性别
+
         List<CascaderSysDictVo> result = null;
         // 用于文章标签的缓存
         Object o = redisTemplate.opsForValue().get("CascaderDictVoListToUseArticle");
@@ -107,7 +108,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
      * @return
      */
     @Override
-    public Map<String, Object> findArticleById(Integer articleId) {
+    public Map<String, Object> findArticleById(Long articleId) {
         Map<String, Object> map = new HashMap<>();
         map.put("articleData",this.getById(articleId));
         //List<BArticleTags> list = this.findArticleTagsByArticleId(articleId);
@@ -145,7 +146,6 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         Boolean tagsFlag = addArticleTags(bArticlePlus.getArticleTags(),bArticlePlus.getArticleId());
         // Integer articleStatus = sysDictMapper.selectOne(new LambdaQueryWrapper<SysDict>().select(SysDict::getDictId).eq(SysDict::getDictValue,"待审核")).getDictId();
         // Boolean row = this.save(bArticle);
-
         // 添加文章审核,状态为待审核的文章都添加申请表单进去
         if(bArticlePlus.getArticleStatus().equals(ARTICLESTATUS) ){
             BArticleApplicationForm  bArticleApplicationForm =new BArticleApplicationForm(bArticlePlus.getArticleId());
@@ -274,10 +274,11 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     /**
      * 假删除，只是改变文章状态
      * @param bArticle
-     * @return
+     * @return Integer
      */
     @Override
     public Integer deleteToChangeArticleStatus(BArticle bArticle) {
+
         // 变更为回收站
         bArticle.setArticleStatus(97);
         // 文章审核
@@ -298,7 +299,7 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     /**
      * 真的删除文章
      * @param articleId
-     * @return
+     * @return Integer
      */
     @Override
     public Integer deleteArticle(Integer articleId) {
@@ -310,12 +311,27 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         return rows;
     }
 
+    /**
+     * 根据用户id和所选状态获取个人文章列表
+     * @param articleStatusId
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<BArticleVo> getPersonalArticleList(Integer articleStatusId, Integer userId) {
+
+        List<BArticleVo> data = this.bArticleMapper.getPersonalArticleList(articleStatusId, userId);
+        for(BArticleVo bArticleVo : data){
+            bArticleVo.setArticleTags(this.bArticleTagsServiceImpl.getBaseMapper().selectList(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,bArticleVo.getArticleId())));
+        }
+        return data;
+    }
 
 
     /**
      * 回传给前端在级联选择器上渲染的v-model的数据
      */
-    private List<List<Integer>> findArticleTagsByArticleId(Integer articleId){
+    private List<List<Integer>> findArticleTagsByArticleId(Long articleId){
         // 查找对应文章id所具有的标签
         LambdaQueryWrapper<BArticleTags> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.select(BArticleTags::getTagId,BArticleTags::getTagName,BArticleTags::getTagParentId,BArticleTags::getTagGrandparentId)
@@ -345,8 +361,8 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
      */
     @Override
     public IPage<BArticleVo> findArticleList(BArticlePageParam bArticlePageParam) {
-        Long currentPage = bArticlePageParam.getCurrentPage();
-        Long pageSize = bArticlePageParam.getPageSize();
+        Long currentPage = bArticlePageParam.getCurrentPage() == null ?1L:bArticlePageParam.getCurrentPage();
+        Long pageSize = bArticlePageParam.getPageSize() == null?10L:bArticlePageParam.getPageSize();
 
         IPage<BArticleVo> bArticleVoIPage = bArticleMapper.findArticleList(new Page<BArticleVo>(currentPage,pageSize),bArticlePageParam);
 

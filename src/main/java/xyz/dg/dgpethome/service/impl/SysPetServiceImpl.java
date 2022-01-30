@@ -1,5 +1,6 @@
 package xyz.dg.dgpethome.service.impl;
 
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -62,6 +63,17 @@ public class SysPetServiceImpl extends ServiceImpl<SysPetMapper, SysPet> impleme
 
     @Override
     public SysPetVo findPetById(Long petId) {
+
         return this.sysPetMapper.findPetById(petId);
+    }
+
+    /**
+     * 锁定指定宠物
+     * @param petId
+     * @return
+     */
+    @Override
+    public Integer lockPetState(Long petId) {
+        return this.sysPetMapper.lockPetState(petId);
     }
 }

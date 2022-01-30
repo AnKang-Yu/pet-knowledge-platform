@@ -3,6 +3,7 @@ package xyz.dg.dgpethome.model.page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author Dugong
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 public class ApplicationFormParam extends PageParam{
 
     /**

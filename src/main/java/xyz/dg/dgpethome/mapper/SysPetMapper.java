@@ -25,4 +25,7 @@ public interface SysPetMapper  extends BaseMapper<SysPet> {
 
     @Update("UPDATE `sys_pet` SET `pet_owner_id` = #{newOwnerId} WHERE `pet_id` = #{petId}")
     Integer changePetOwnerIdByPetId(Long petId, Integer newOwnerId);
+
+    @Update("UPDATE `sys_pet` SET `pet_lock_state`= abs(pet_lock_state -1) WHERE `pet_id` = #{petId}  ")
+    Integer lockPetState(Long petId);
 }

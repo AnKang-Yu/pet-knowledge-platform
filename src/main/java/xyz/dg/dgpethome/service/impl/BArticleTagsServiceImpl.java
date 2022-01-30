@@ -7,6 +7,8 @@ import xyz.dg.dgpethome.model.po.BArticleTags;
 import xyz.dg.dgpethome.service.BArticleTagsService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,8 +22,19 @@ public class BArticleTagsServiceImpl extends ServiceImpl<BArticleTagsMapper, BAr
     private BArticleTagsMapper bArticleTagsMapper;
 
 
+    /**
+     * @param tagsList
+     * @return
+     */
     @Override
     public Integer addArticleTagsByBatch(List<BArticleTags> tagsList){
+//        List<HashMap<String,Object>> list = new ArrayList<>(4);
+//        for(int i = 0; i < list.size() ; i++){
+//            list.add(new HashMap<String, Object>(2));
+//        }
+//        list.get(0).put("","");
+//        // ....
+//        HashMap<String,Object> [] mapArray = list.toArray(new HashMap[list.size()]);
         return bArticleTagsMapper.addArticleTagsByBatch(tagsList);
     }
 }

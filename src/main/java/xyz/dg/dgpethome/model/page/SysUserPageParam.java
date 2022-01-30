@@ -3,6 +3,7 @@ package xyz.dg.dgpethome.model.page;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
 
@@ -15,6 +16,7 @@ import xyz.dg.dgpethome.model.vo.SysUserVo;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 public class SysUserPageParam extends PageParam{
 
     /**

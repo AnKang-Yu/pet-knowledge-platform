@@ -45,7 +45,7 @@ public interface BArticleService extends IService<BArticle> {
      * 根据文章Id查文章
      * @return
      */
-    Map<String,Object> findArticleById(Integer articleId);
+    Map<String,Object> findArticleById(Long articleId);
 
     /**
      * 添加文章方法
@@ -73,10 +73,8 @@ public interface BArticleService extends IService<BArticle> {
      */
     Integer deleteArticle(Integer articleId);
 
-    /**
-     * 更改文章状态
-     * @param articleId
-     * @param statusCode
-     * @return
-     */
+
+
+
+    List<BArticleVo> getPersonalArticleList(Integer articleStatusId ,Integer userId);
 }

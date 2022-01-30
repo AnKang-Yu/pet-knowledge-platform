@@ -13,12 +13,13 @@
     <result column="pet_status_id" jdbcType="INTEGER" property="petStatusId" />
     <result column="pet_birthday" jdbcType="TIMESTAMP" property="petBirthday" />
     <result column="pet_avatar" jdbcType="VARCHAR" property="petAvatar" />
+    <result column="pet_lock_state" jdbcType="BOOLEAN" property="petLockState" />
   </resultMap>
 
  <sql id="Base_Column_List">
     <!--@mbg.generated-->
     pet_id, pet_owner_id, pet_name, pet_variety_id,pet_variety_name, pet_sex, pet_neutered, pet_status_id, pet_birthday,
-    pet_avatar,pet_status_name
+    pet_avatar,pet_status_name,pet_lock_state
   </sql>
   <resultMap id="BaseResultMap_Vo" type="xyz.dg.dgpethome.model.vo.SysPetVo">
     <!--@mbg.generated-->
@@ -48,15 +49,17 @@
     FROM `sys_pet` sp  JOIN `sys_dict` sd1 ON sp.pet_variety_id = sd1.dict_id
     LEFT JOIN `sys_dict` sd2 ON sp.pet_status_id = sd2.dict_id
      <where>
+
         <if test="sysPetPageParam.petOwnerId != null">
-            sp.pet_owner_id = #{sysPetPageParam.petOwnerId} AND
+            sp.pet_owner_id = #{sysPetPageParam.petOwnerId}
         </if>
         <if test="sysPetPageParam.petVarietyId != null">
-            sp.pet_variety_id = #{sysPetPageParam.petVarietyId} AND
+            sp.pet_variety_id = #{sysPetPageParam.petVarietyId}
         </if>
         <if test="sysPetPageParam.petNeutered != null">
             sp.pet_neutered = #{sysPetPageParam.petNeutered}
         </if>
+        and sp.pet_lock_state = '0'
      </where>
   </select>
 

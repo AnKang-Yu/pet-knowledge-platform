@@ -139,7 +139,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                 temp.setDictId(dictVo.getDictId());
                 temp.setDictValue(dictVo.getDictValue());
                 // 递归
-                temp.setList(getTreeDataLoop(dictVo.getDictId(),new ArrayList<>()));
+                temp.setChildren(getTreeDataLoop(dictVo.getDictId(),new ArrayList<>()));
                 result.add(temp);
             }
         return result;

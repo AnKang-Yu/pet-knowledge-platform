@@ -1,5 +1,6 @@
 package xyz.dg.dgpethome;
 
+import cn.hutool.core.util.DesensitizedUtil;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -148,4 +149,11 @@ class DgpethomeApplicationTests {
 //        final boolean matches = encoder.matches(pass, passHash);
 //        System.out.println(matches);
 //    }
+
+    @Test
+    public void testUtil(){
+        String name  = DesensitizedUtil.chineseName("嬴政");
+        System.out.println(name);
+
+    }
 }

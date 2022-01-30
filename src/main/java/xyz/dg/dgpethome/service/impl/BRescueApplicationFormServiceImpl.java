@@ -61,6 +61,8 @@ public class BRescueApplicationFormServiceImpl extends ServiceImpl<BRescueApplic
             // 提交申请的人申请弃养，将宠物主人id改为动物收容所的默认id 0
             b = sysPetMapper.changePetOwnerIdByPetId(bRescueApplicationForm.getPetId(),0);
         }
+        // 接触目标宠物的锁定状态
+        sysPetMapper.lockPetState(bRescueApplicationForm.getPetId());
         if((a&b) >0){
             return true;
         }
@@ -76,9 +78,31 @@ public class BRescueApplicationFormServiceImpl extends ServiceImpl<BRescueApplic
     public Boolean editSuccourApplicationFormFailure(BRescueApplicationForm bRescueApplicationForm) {
         bRescueApplicationForm.setFormStatus(105);
         Integer a = this.bRescueApplicationFormMapper.updateById(bRescueApplicationForm);
+        // 接触目标宠物的锁定状态
+        sysPetMapper.lockPetState(bRescueApplicationForm.getPetId());
         if(a>0){
             return true;
         }
         return false;
+    }
+
+    /**
+     * 用户查找自己的宠物申请记录
+     * @param applicationFormParam
+     * @param userId
+     * @return
+     */
+    @Override
+    public IPage<BRescueApplicationFormVo> getPetRescueFormList(ApplicationFormParam applicationFormParam, Integer userId) {
+        Long currentPage = applicationFormParam.getCurrentPage();
+        Long pageSize = applicationFormParam.getPageSize();
+
+        IPage<BRescueApplicationFormVo> data = bRescueApplicationFormMapper.getPetRescueFormList(new Page<>(currentPage,pageSize), applicationFormParam, userId);
+        return data;
+    }
+
+    @Override
+    public Integer backoutRescueFormById(Integer target,Long formId, Integer userId) {
+        return bRescueApplicationFormMapper.backoutRescueFormById(target,formId, userId);
     }
 }

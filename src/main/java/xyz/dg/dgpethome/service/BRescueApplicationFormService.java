@@ -18,4 +18,8 @@ public interface BRescueApplicationFormService extends IService<BRescueApplicati
     Boolean editSuccourApplicationFormSuccess( BRescueApplicationForm bRescueApplicationForm);
 
     Boolean editSuccourApplicationFormFailure( BRescueApplicationForm bRescueApplicationForm);
+
+    IPage<BRescueApplicationFormVo> getPetRescueFormList(ApplicationFormParam applicationFormParam, Integer userId);
+
+    Integer backoutRescueFormById(Integer target,Long formId, Integer userId);
 }

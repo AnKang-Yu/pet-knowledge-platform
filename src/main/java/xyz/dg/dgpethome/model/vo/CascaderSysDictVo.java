@@ -24,5 +24,5 @@ public class CascaderSysDictVo {
      * 字典名称
      */
     private String dictValue;
-    private List<CascaderSysDictVo> list;
+    private List<CascaderSysDictVo> children;
 }

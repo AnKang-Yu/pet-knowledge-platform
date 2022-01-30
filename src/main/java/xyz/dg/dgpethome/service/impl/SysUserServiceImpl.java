@@ -2,6 +2,8 @@ package xyz.dg.dgpethome.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.DesensitizedUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,9 +26,12 @@ import xyz.dg.dgpethome.mapper.SysUserMapper;
 import xyz.dg.dgpethome.model.vo.SysDictVo;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
+import xyz.dg.dgpethome.service.SysDictService;
 import xyz.dg.dgpethome.service.SysUserService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +47,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
 //    BCryptPasswordEncoderUtil bCryptPasswordEncoderUtil;
     @Resource
     private  SysUserMapper sysUserMapper;
+    @Resource
+    private SysDictService sysDictServiceImpl;
+
+
     //用户状态   字典里id是31
     private static final Integer USER_STATE = 31;
 
@@ -153,6 +162,28 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
     public SysUser passwordToEncode(SysUser sysUser) {
         sysUser.setUserPassword(SaSecureUtil.sha256(sysUser.getUserPassword()));
         return sysUser;
+    }
+
+    /**
+     * 数据脱敏
+     * @param sysUser
+     * @return
+     */
+    @Override
+    public Map<String, Object> dataMaskUserInfo(SysUser sysUser) {
+        Map<String, Object> data = new HashMap<>();
+        // 用户账户
+        data.put("userAccount", sysUser.getUserAccount());
+        data.put("userMaskAccount", DesensitizedUtil.chineseName(sysUser.getUserAccount()));
+        // 手机号
+        data.put("userPhone",DesensitizedUtil.mobilePhone(sysUser.getUserPhone()));
+        // 邮箱
+        data.put("userEmail",DesensitizedUtil.email(sysUser.getUserEmail()));
+        data.put("userSex",sysUser.getUserSex());
+        data.put("userRoleName",sysDictServiceImpl.getById(sysUser.getUserRoleId()).getDictValue());
+        data.put("userStatusName",sysDictServiceImpl.getById(sysUser.getUserStatus()).getDictValue());
+
+        return data;
     }
 
 
