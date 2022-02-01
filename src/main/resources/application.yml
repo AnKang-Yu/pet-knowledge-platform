@@ -8,8 +8,8 @@ spring:
       max-request-size: 15MB
 
   profiles:
-    include: jdbc,redis
- # ,mail
+    include: jdbc,redis,mail
+ #
   devtools:
     restart:
       enabled: false

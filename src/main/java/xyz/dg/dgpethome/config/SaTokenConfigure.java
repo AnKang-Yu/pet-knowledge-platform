@@ -46,7 +46,7 @@ public class SaTokenConfigure implements WebMvcConfigurer {
 
             // 登录验证 -- 排除多个路径 /admin/login
             SaRouter.match(Arrays.asList("/**"),
-                    Arrays.asList("/login","/admin/login","/showImage","/api/search/**"),
+                    Arrays.asList("/login","/admin/login","/showImage","/api/search/**","/api/registerUser","/api/getRegisterCode"),
                     () -> StpUtil.checkLogin());
 
             // 角色认证 -- 拦截以 admin 开头的路由，必须具备[admin]角色或者[super-admin]角色才可以通过认证

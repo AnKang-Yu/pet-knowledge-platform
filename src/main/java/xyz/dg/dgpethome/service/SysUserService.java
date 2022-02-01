@@ -11,6 +11,7 @@ import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
+import xyz.dg.dgpethome.utils.JsonResult;
 //import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 
 /**
@@ -57,4 +58,8 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      */
     Map<String, Object> dataMaskUserInfo(SysUser sysUser);
+
+    JsonResult registerUser(SysUser sysUser , String code);
+
+    JsonResult getRegisterCode(String userEmail);
 }

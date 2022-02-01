@@ -1,19 +1,18 @@
 package xyz.dg.dgpethome.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.DesensitizedUtil;
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,7 +27,11 @@ import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 import xyz.dg.dgpethome.service.SysDictService;
 import xyz.dg.dgpethome.service.SysUserService;
+import xyz.dg.dgpethome.utils.JsonResult;
+import xyz.dg.dgpethome.utils.JsonResultUtils;
+import xyz.dg.dgpethome.utils.MailUtils;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,18 +175,73 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
     @Override
     public Map<String, Object> dataMaskUserInfo(SysUser sysUser) {
         Map<String, Object> data = new HashMap<>();
+        data.put("userId",sysUser.getUserId());
         // 用户账户
         data.put("userAccount", sysUser.getUserAccount());
         data.put("userMaskAccount", DesensitizedUtil.chineseName(sysUser.getUserAccount()));
         // 手机号
-        data.put("userPhone",DesensitizedUtil.mobilePhone(sysUser.getUserPhone()));
+        data.put("userPhone",sysUser.getUserPhone());
+        data.put("userMaskPhone",DesensitizedUtil.mobilePhone(sysUser.getUserPhone()));
         // 邮箱
-        data.put("userEmail",DesensitizedUtil.email(sysUser.getUserEmail()));
+        data.put("userEmail",sysUser.getUserEmail());
+        data.put("userMaskEmail",DesensitizedUtil.email(sysUser.getUserEmail()));
         data.put("userSex",sysUser.getUserSex());
         data.put("userRoleName",sysDictServiceImpl.getById(sysUser.getUserRoleId()).getDictValue());
         data.put("userStatusName",sysDictServiceImpl.getById(sysUser.getUserStatus()).getDictValue());
 
         return data;
+    }
+
+    /**
+     *  注册用户
+     * @param sysUser
+     * @param code
+     * @return
+     */
+    @Override
+    public JsonResult registerUser(SysUser sysUser, String code) {
+        if("1234".equals(code)){
+            // 验证码通过
+            //判断用户是否存在，如果存在且密码正确，则保存该用户对象
+            SysUser existUser = this.getUserByUserUsername(sysUser.getUserName());
+            if(existUser != null){
+                return JsonResultUtils.error("用户名已存在");
+            }
+            // 设置和用户名同名的账户名
+            sysUser.setUserAccount(sysUser.getUserName());
+            // 23普通用户
+            sysUser.setUserRoleId(23);
+            // 31启用状态
+            sysUser.setUserStatus(31);
+            Integer rows = this.baseMapper.insert(sysUser);
+            if(rows > 0){
+                //200
+                return JsonResultUtils.success("注册成功");
+            }
+            //500
+            return JsonResultUtils.error("注册失败");
+        }
+        //500
+        return JsonResultUtils.error("验证码错误");
+    }
+
+    @Autowired
+    private MailUtils mailUtils;
+    /**
+     * 邮箱发送验证码
+     * @return
+     */
+    @Override
+    public JsonResult getRegisterCode(String userEmail) {
+        if(userEmail == null){
+            return JsonResultUtils.error("验证码发送失败，邮箱为空");
+        }
+        //  邮件发送
+        String title = " 用户注册验证码";
+        String code = RandomUtil.randomString(4);
+        String content = "<html><body>用户注册验证码为: <b>"+ code+ "</b></body></html>";
+        mailUtils.sendSimpleEmail(userEmail,title,content);
+        return JsonResultUtils.success("验证发已发送");
     }
 
 

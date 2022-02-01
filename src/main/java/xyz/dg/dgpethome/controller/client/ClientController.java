@@ -1,8 +1,12 @@
 package xyz.dg.dgpethome.controller.client;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.dg.dgpethome.model.page.ApplicationFormParam;
@@ -233,6 +237,31 @@ public class ClientController {
         //500
         return JsonResultUtils.error("绑定宠物失败");
     }
+   private static final ObjectMapper JACKSON = new ObjectMapper();
+
+    /**
+     * 注册用户
+     * @param map
+     * @return
+     * @throws JsonProcessingException
+     */
+    @PostMapping("/api/registerUser")
+    public JsonResult registerUser(@RequestBody Map<String,Object> map) throws JsonProcessingException {
+        log.info("新增用户" );
+        SysUser sysUser = JACKSON.readValue(JACKSON.writeValueAsString(map.get("user")), SysUser.class);
+        log.info(sysUser.toString());
+        String code = map.get("verificationCode").toString();
+        log.info(code);
+
+        return sysUserServiceImpl.registerUser(sysUser, code);
+    }
+    @GetMapping("/api/getRegisterCode")
+    public JsonResult getRegisterCode(@RequestParam String userEmail){
+        log.info("获取验证码"+userEmail);
+        return sysUserServiceImpl.getRegisterCode(userEmail);
+    }
+
+
     /**
      * 编辑宠物
      * @param sysPet
@@ -352,10 +381,14 @@ public class ClientController {
         String token = request.getHeader("Authorization");
         // 当前用户
         Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token));
-        boolean rows = sysUserServiceImpl.updateById(sysUser);
-        if(rows){
-            //200
-            return JsonResultUtils.success("编辑成功");
+        if(userId.equals(sysUser.getUserId())){
+            // 真的是自己在修改
+            sysUser.setUpdateUser(userId);
+            boolean rows = sysUserServiceImpl.updateById(sysUser);
+            if(rows){
+                //200
+                return JsonResultUtils.success("编辑成功");
+            }
         }
         //500
         return JsonResultUtils.error("编辑失败");
