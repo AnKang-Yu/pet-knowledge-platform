@@ -83,12 +83,18 @@
                 article_authorId = #{userId}
            </if>
            <choose>
-                <when test="articleStatusId != null">
-                   AND article_status in (#{articleStatusId}, 95)
+                <when test="articleStatusId == 93">
+                   AND article_status in (93, 95)
                 </when>
-                <otherwise>
-                   AND article_status in (94,96,97)
-                </otherwise>
+                <when test="articleStatusId == 96">
+                   AND article_status in (94, 96)
+                </when>
+                <when test="articleStatusId == null">
+                   AND article_status in (94,95,96,97)
+                </when>
+<!--                <otherwise>-->
+<!--                   AND article_status in (93,94,95,96,97)-->
+<!--                </otherwise>-->
             </choose>
         </where>
     </select>

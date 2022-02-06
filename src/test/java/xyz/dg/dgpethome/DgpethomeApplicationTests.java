@@ -65,20 +65,7 @@ class DgpethomeApplicationTests {
              }
     }
 
-    /**
-     * 测试分页2
-     */
-    @Test
-    public void testPageUser2(){
-        SysUserPageParam sysUserPageParam = new SysUserPageParam();
-        sysUserPageParam.setPageSize(10L);
-        sysUserPageParam.setCurrentPage(2L);
 
-        IPage<SysUserVo> iPage = sysUserServiceImpl.findUserList(sysUserPageParam);
-        for(SysUserVo i : iPage.getRecords()){
-            System.out.println(i.toString());
-        }
-    }
 
     @Test
     public void testSalt(){

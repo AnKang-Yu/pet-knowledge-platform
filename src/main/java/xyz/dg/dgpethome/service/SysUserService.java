@@ -12,6 +12,8 @@ import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 import xyz.dg.dgpethome.utils.JsonResult;
+
+import javax.mail.MessagingException;
 //import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
 
 /**
@@ -41,7 +43,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param sysUserPageParam
      * @return
      */
-    IPage<SysUserVo> findUserList(SysUserPageParam sysUserPageParam);
+    IPage<SysUserVo> findUserList(SysUserPageParam sysUserPageParam,Integer userId);
 
     /**
      * 对新增用户的密码进行加密
@@ -61,5 +63,11 @@ public interface SysUserService extends IService<SysUser> {
 
     JsonResult registerUser(SysUser sysUser , String code);
 
-    JsonResult getRegisterCode(String userEmail);
+    JsonResult getRegisterCode(String userEmail) throws MessagingException;
+
+    JsonResult editCurrentUserInfo(SysUser sysUser);
+
+    JsonResult getRetrieveCode(SysUser sysUser) throws MessagingException;
+
+    JsonResult resetUserPwd(String userName ,String newPwd, String code);
 }

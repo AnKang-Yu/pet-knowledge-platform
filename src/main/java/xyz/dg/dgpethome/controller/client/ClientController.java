@@ -17,14 +17,12 @@ import xyz.dg.dgpethome.model.vo.BArticleVo;
 import xyz.dg.dgpethome.model.vo.BRescueApplicationFormVo;
 import xyz.dg.dgpethome.model.vo.SysDictVo;
 import xyz.dg.dgpethome.model.vo.SysPetVo;
-import xyz.dg.dgpethome.service.BArticleService;
-import xyz.dg.dgpethome.service.BRescueApplicationFormService;
-import xyz.dg.dgpethome.service.SysPetService;
-import xyz.dg.dgpethome.service.SysUserService;
+import xyz.dg.dgpethome.service.*;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,6 +48,8 @@ public class ClientController {
     private BRescueApplicationFormService bRescueApplicationFormImpl;
     @Resource
     private SysUserService sysUserServiceImpl;
+    @Resource
+    private BArticleApplicationFormService bArticleApplicationFormServiceImpl;
 
 
     /**
@@ -219,7 +219,16 @@ public class ClientController {
         return JsonResultUtils.success("查询成功",data);
     }
 
-
+    @GetMapping("/api/select/getArticleFormDetailInfo")
+    public JsonResult getArticleFormDetailInfo(HttpServletRequest request, @RequestParam  String articleId){
+        if(articleId == null){
+            return JsonResultUtils.error("查询失败,文章id参数为空");
+        }
+        String token = request.getHeader("Authorization");
+        log.info("前台传入的token: "+token);
+        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
+        return bArticleApplicationFormServiceImpl.getArticleFormDetailInfo(Long.parseLong(articleId) ,userId);
+    }
 
     /**
      * 客户端绑定宠物
@@ -256,7 +265,7 @@ public class ClientController {
         return sysUserServiceImpl.registerUser(sysUser, code);
     }
     @GetMapping("/api/getRegisterCode")
-    public JsonResult getRegisterCode(@RequestParam String userEmail){
+    public JsonResult getRegisterCode(@RequestParam String userEmail) throws MessagingException {
         log.info("获取验证码"+userEmail);
         return sysUserServiceImpl.getRegisterCode(userEmail);
     }
@@ -384,11 +393,8 @@ public class ClientController {
         if(userId.equals(sysUser.getUserId())){
             // 真的是自己在修改
             sysUser.setUpdateUser(userId);
-            boolean rows = sysUserServiceImpl.updateById(sysUser);
-            if(rows){
-                //200
-                return JsonResultUtils.success("编辑成功");
-            }
+            return  sysUserServiceImpl.editCurrentUserInfo(sysUser);
+
         }
         //500
         return JsonResultUtils.error("编辑失败");
@@ -425,6 +431,27 @@ public class ClientController {
         return JsonResultUtils.error("提交申请失败");
     }
 
+    /**
+     * 校验用户并发送验证码
+     * @param userName
+     * @return
+     * @throws MessagingException
+     */
+    @GetMapping("/api/search/estimateUserByUserName")
+    public JsonResult estimateUserByUserName(@RequestParam String userName) throws MessagingException {
+        SysUser userByUserUsername = this.sysUserServiceImpl.getUserByUserUsername(userName);
+        if(userByUserUsername == null){
+            return JsonResultUtils.error("无此用户");
+        }
+        return sysUserServiceImpl.getRetrieveCode(userByUserUsername);
+    }
 
+    @PutMapping("/api/resetUserPwd")
+    public JsonResult resetUserPwd(@RequestBody Map<String,Object> map){
+        String code = map.get("verificationCode").toString();
+        String newPwd = map.get("newPwd").toString();
+        String name = map.get("userName").toString();
+        return sysUserServiceImpl.resetUserPwd(name,newPwd,code);
+    }
 
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.dg.dgpethome.model.page.ApplicationFormParam;
 import xyz.dg.dgpethome.model.po.BArticleApplicationForm;
 import xyz.dg.dgpethome.model.vo.BArticleApplicationFormVo;
+import xyz.dg.dgpethome.utils.JsonResult;
 
 /**
  * @author Dugong
@@ -35,4 +36,7 @@ public interface BArticleApplicationFormService extends IService<BArticleApplica
      * @return
      */
     Boolean editArticleApplicationFormFailure(BArticleApplicationForm bArticleApplicationForm);
+
+
+    JsonResult getArticleFormDetailInfo(Long articleId, Integer userId);
 }

@@ -43,14 +43,19 @@
     <!--@mbg.generated-->
     `user_id`, `user_account`, `user_name`,  `user_sex`, `user_role_id`,  `user_status`
   </sql>
-
-  <select id="findUserList" resultMap="BaseResultMap_Vo"  parameterType="xyz.dg.dgpethome.model.page.SysUserPageParam">
+<!--parameterType="xyz.dg.dgpethome.model.page.SysUserPageParam"-->
+  <select id="findUserList" resultMap="BaseResultMap_Vo"  >
     SELECT
       <include refid="Base_Column_List_Vo" />
       FROM `sys_dict` d1
       join `sys_user` u on u.user_role_id = d1.dict_id
         <where>
             d1.dict_parent_id = #{sysUserPageParam.dictParentId}
+            and
+            u.user_role_id != 20
+            <if test="userId != null">
+                and u.user_id != #{userId}
+            </if>
             <if test="sysUserPageParam.userName != null">
                 and
                 u.user_name LIKE concat('%',#{sysUserPageParam.userName,jdbcType=VARCHAR},'%')

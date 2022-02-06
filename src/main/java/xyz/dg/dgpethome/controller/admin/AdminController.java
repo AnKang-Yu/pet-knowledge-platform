@@ -14,6 +14,7 @@ import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.service.SysUserService;
+import xyz.dg.dgpethome.utils.FilesUtils;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
 //import xyz.dg.dgpethome.utils.JwtTokenUtil;
@@ -42,6 +43,8 @@ public class AdminController {
     SysUserService sysUserServiceImpl;
 //    @Autowired
 //    JwtTokenUtil jwtTokenUtil;
+    @Resource
+    FilesUtils filesUtils;
 
     /**
      * 测试
@@ -112,6 +115,7 @@ public class AdminController {
         list.add(sysUser.getUserRoleId());
         data.put("useraccount",sysUser.getUserAccount());
         data.put("userId",sysUser.getUserId());
+        data.put("avatar",filesUtils.getFile(sysUser.getUserAvatar()));
         data.put("name",sysUser.getUserName());
         data.put("roles", list);
         data.put("status",sysUser.getUserStatus());
@@ -130,10 +134,13 @@ public class AdminController {
      * @return
      */
     @GetMapping("/admin/findUserList")
-    public JsonResult findUserList(SysUserPageParam sysUserPageParam){
+    public JsonResult findUserList(HttpServletRequest request,SysUserPageParam sysUserPageParam){
+        String token = request.getHeader("Authorization");
+        log.info("前台传入的token: "+token);
+        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
         log.info("查找的用户参数 ： " + sysUserPageParam.toString());
         //IPage<SysUserVo> userList = sysUserServiceImpl.testPage(sysUserPageParam);
-        IPage<SysUserVo> userList = sysUserServiceImpl.findUserList(sysUserPageParam);
+        IPage<SysUserVo> userList = sysUserServiceImpl.findUserList(sysUserPageParam,userId);
         //System.out.println(userList.toString());
         return JsonResultUtils.success("查询成功",userList);
 

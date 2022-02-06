@@ -143,6 +143,20 @@ public class BArticleController {
         // return JsonResultUtils.success("编辑文章成功");
     }
 
+    @PostMapping("/article/changeArticleAllowCommentStatus")
+    public JsonResult changeArticleAllowCommentStatus(@RequestBody BArticle bArticle){
+        log.info("执行更新评论状态方法");
+        //影响行数
+        boolean rows = bArticleServiceImpl.updateById(bArticle);
+        if(rows){
+            //200
+            return JsonResultUtils.success("更新成功");
+        }
+        //500
+        return JsonResultUtils.error("更新失败");
+    }
+
+
     /**
      * 删除文章方法
      * @param articleId 待删除的文章Id

@@ -16,6 +16,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import javax.naming.AuthenticationException;
 
 
@@ -35,6 +36,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -134,12 +136,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
      * @return
      */
     @Override
-    public IPage<SysUserVo> findUserList(SysUserPageParam sysUserPageParam) {
+    public IPage<SysUserVo> findUserList(SysUserPageParam sysUserPageParam,Integer userId) {
 
         Long currentPage = sysUserPageParam.getCurrentPage();
         Long pageSize = sysUserPageParam.getPageSize();
         //初始化
-        IPage<SysUserVo> userVoIPage = sysUserMapper.findUserList(new Page<SysUserVo>(currentPage,pageSize),sysUserPageParam);
+        IPage<SysUserVo> userVoIPage = sysUserMapper.findUserList(new Page<SysUserVo>(currentPage,pageSize),sysUserPageParam,userId);
         //IPage<SysUser> temp = new Page<SysUser>(currentPage,pageSize);
         //构造用户表查询条件
 //        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
@@ -176,6 +178,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
     public Map<String, Object> dataMaskUserInfo(SysUser sysUser) {
         Map<String, Object> data = new HashMap<>();
         data.put("userId",sysUser.getUserId());
+        data.put("userName",sysUser.getUserName());
         // 用户账户
         data.put("userAccount", sysUser.getUserAccount());
         data.put("userMaskAccount", DesensitizedUtil.chineseName(sysUser.getUserAccount()));
@@ -200,7 +203,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
      */
     @Override
     public JsonResult registerUser(SysUser sysUser, String code) {
-        if("1234".equals(code)){
+        Object o = redisTemplate.opsForValue().get("registerCode_"+sysUser.getUserEmail());
+        if(o == null){
+            return JsonResultUtils.error("验证码无效或已过期");
+        }
+        String redisCode = String.valueOf(o);
+        if(redisCode.equals(code)){
             // 验证码通过
             //判断用户是否存在，如果存在且密码正确，则保存该用户对象
             SysUser existUser = this.getUserByUserUsername(sysUser.getUserName());
@@ -213,7 +221,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
             sysUser.setUserRoleId(23);
             // 31启用状态
             sysUser.setUserStatus(31);
-            Integer rows = this.baseMapper.insert(sysUser);
+            // 加密
+            SysUser encodeUser = this.passwordToEncode(sysUser);
+            Integer rows = this.baseMapper.insert(encodeUser);
+            // 删除缓存
+            redisTemplate.delete("registerCode_"+sysUser.getUserEmail());
             if(rows > 0){
                 //200
                 return JsonResultUtils.success("注册成功");
@@ -232,16 +244,77 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
      * @return
      */
     @Override
-    public JsonResult getRegisterCode(String userEmail) {
+    public JsonResult getRegisterCode(String userEmail) throws MessagingException {
         if(userEmail == null){
             return JsonResultUtils.error("验证码发送失败，邮箱为空");
         }
         //  邮件发送
         String title = " 用户注册验证码";
         String code = RandomUtil.randomString(4);
-        String content = "<html><body>用户注册验证码为: <b>"+ code+ "</b></body></html>";
+        // 5分钟后过期
+        redisTemplate.opsForValue().set("registerCode_"+userEmail ,code,5, TimeUnit.MINUTES);
+        String content = "<body>用户注册验证码为: <b>"+ code+ "</b>，五分钟后过期</body>";
         mailUtils.sendSimpleEmail(userEmail,title,content);
         return JsonResultUtils.success("验证发已发送");
+    }
+
+    @Override
+    public JsonResult editCurrentUserInfo(SysUser sysUser) {
+        Boolean rows = this.updateById(sysUser);
+        if(rows){
+            //200
+            // 清除原先的缓存
+            redisTemplate.delete("userName_"+sysUser.getUserName());
+            return JsonResultUtils.success("编辑成功");
+        }
+        return JsonResultUtils.success("编辑失败");
+    }
+
+    @Override
+    public JsonResult getRetrieveCode(SysUser sysUser) throws MessagingException {
+        if(sysUser.getUserEmail() == null){
+            return JsonResultUtils.error("验证码发送失败，邮箱为空");
+        }
+        //  邮件发送
+        String title = " 用户验证码";
+        String code = RandomUtil.randomString(4);
+        // 5分钟后过期
+        redisTemplate.opsForValue().set("retrieveCode_"+sysUser.getUserName() ,code,5, TimeUnit.MINUTES);
+        String content = "<body>用户验证码为: <b>"+ code+ "</b>，五分钟后过期</body>";
+        mailUtils.sendSimpleEmail(sysUser.getUserEmail(),title,content);
+        return JsonResultUtils.success("验证发已发送");
+    }
+
+    @Override
+    public JsonResult resetUserPwd(String userName,String newPwd, String code) {
+        if(userName == null || newPwd == null || code == null){
+            return JsonResultUtils.error("请求参数错误");
+        }
+        Object o = redisTemplate.opsForValue().get("retrieveCode_"+userName);
+        if(o == null){
+            return JsonResultUtils.error("验证码无效或已过期");
+        }
+        String redisCode = String.valueOf(o);
+        if(redisCode.equals(code)){
+            // 验证码通过
+            // 取用户
+            SysUser existUser = this.getUserByUserUsername(userName);
+            existUser.setUserPassword(newPwd);
+            // 加密
+            SysUser encodeUser = this.passwordToEncode(existUser);
+            Boolean rows = this.updateById(encodeUser);
+            // 删除缓存
+            redisTemplate.delete("registerCode_"+userName);
+            redisTemplate.delete("userName_"+userName);
+            if(rows ){
+                //200
+                return JsonResultUtils.success("更新密码成功");
+            }
+            //500
+            return JsonResultUtils.error("更改密码失败");
+        }
+        //500
+        return JsonResultUtils.error("验证码错误");
     }
 
 

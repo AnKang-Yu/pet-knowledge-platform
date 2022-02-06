@@ -1,5 +1,7 @@
 package xyz.dg.dgpethome.utils;
 
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,6 +11,7 @@ import java.io.IOException;
  * @date 2021-11-07 14:27
  * @description
  **/
+@Component
 public class FilesUtils {
     public byte[] getFile(String path) throws IOException {
         File file = new File(path);
