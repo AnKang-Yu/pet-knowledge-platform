@@ -18,5 +18,4 @@ public class JsonResult<T> {
     private String msg;
     private Integer code;
     private T data;
-
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.dg.dgpethome.mapper.BRescueApplicationFormMapper;
 import xyz.dg.dgpethome.mapper.SysPetMapper;
 import xyz.dg.dgpethome.model.page.ApplicationFormParam;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
  * @description
  **/
 @Service
+@Transactional
 public class BRescueApplicationFormServiceImpl extends ServiceImpl<BRescueApplicationFormMapper, BRescueApplicationForm> implements BRescueApplicationFormService {
 
     @Resource
@@ -61,6 +63,8 @@ public class BRescueApplicationFormServiceImpl extends ServiceImpl<BRescueApplic
             // 提交申请的人申请弃养，将宠物主人id改为动物收容所的默认id 0
             b = sysPetMapper.changePetOwnerIdByPetId(bRescueApplicationForm.getPetId(),0);
         }
+        // 测试事务
+        // int aaa = 10/0;
         // 接触目标宠物的锁定状态
         sysPetMapper.lockPetState(bRescueApplicationForm.getPetId());
         if((a&b) >0){

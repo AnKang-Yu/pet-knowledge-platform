@@ -92,6 +92,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
     /**
      * 根据父字典ID查找所有该父字典底下的所有子字典
+     * @param dictParentId
      * @return
      */
     @Override
@@ -110,7 +111,6 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                 redisTemplate.opsForValue().set("CascaderAllDictVoListByParentId_"+dictParentId ,list);
             }
         }
-        // dictParentId = 0
         return list;
     }
     /**
@@ -144,6 +144,12 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
             }
         return result;
     }
+
+    /**
+     * 根据父id 查询底下一级的子id
+     * @param dictParentId
+     * @return
+     */
     private  List<SysDictVo>  findDictByParentIdNoRedis(Integer dictParentId){
         List<SysDictVo> list =  sysDictMapper.findDictByParentId(dictParentId);
         return list;

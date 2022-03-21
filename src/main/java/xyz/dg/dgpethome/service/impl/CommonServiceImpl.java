@@ -3,6 +3,7 @@ package xyz.dg.dgpethome.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.dg.dgpethome.model.po.BArticle;
 import xyz.dg.dgpethome.model.po.SysPet;
 import xyz.dg.dgpethome.model.po.SysUser;
@@ -72,6 +73,7 @@ public class CommonServiceImpl implements CommonService {
         List<SysPet> strayPetList = this.getPetList(0);
         Map<Integer,Integer> strayPetNumberMap = new HashMap<>();
         for(SysPet sysPet : strayPetList){
+            // 汇总每个宠物分类的的具体宠物数量  xx猫: xx数量
             strayPetNumberMap.put(sysPet.getPetVarietyId(),strayPetNumberMap.getOrDefault(sysPet.getPetVarietyId(),0)+1);
         }
         List<Map<String,Object>> data = new ArrayList<>();
@@ -80,6 +82,7 @@ public class CommonServiceImpl implements CommonService {
             tempMap.put("categoryId",cascaderSysDictVo.getDictId());
             tempMap.put("text",cascaderSysDictVo.getDictValue());
             Integer number = 0;
+            // 汇总为每个科的具体数量 xx科： xx数
             for(CascaderSysDictVo cascaderSysDictVo1: cascaderSysDictVo.getChildren()){
                 if(strayPetNumberMap.containsKey(cascaderSysDictVo1.getDictId())){
                     number += strayPetNumberMap.get(cascaderSysDictVo1.getDictId());

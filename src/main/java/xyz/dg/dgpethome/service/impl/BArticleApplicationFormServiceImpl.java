@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.dg.dgpethome.mapper.BArticleApplicationFormMapper;
 import xyz.dg.dgpethome.mapper.BArticleMapper;
 import xyz.dg.dgpethome.model.page.ApplicationFormParam;
@@ -31,6 +32,7 @@ import java.util.Map;
  **/
 @Service
 @Slf4j
+@Transactional
 public class BArticleApplicationFormServiceImpl extends ServiceImpl<BArticleApplicationFormMapper, BArticleApplicationForm> implements BArticleApplicationFormService {
 
     @Resource

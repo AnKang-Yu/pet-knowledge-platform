@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.dg.dgpethome.mapper.BArticleTagsMapper;
 import xyz.dg.dgpethome.mapper.SysDictMapper;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
  **/
 @Service
 @Slf4j
+@Transactional
 public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> implements BArticleService {
 
     @Resource

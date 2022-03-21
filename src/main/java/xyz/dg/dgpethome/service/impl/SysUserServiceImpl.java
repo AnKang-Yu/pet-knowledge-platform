@@ -210,7 +210,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
         String redisCode = String.valueOf(o);
         if(redisCode.equals(code)){
             // 验证码通过
-            //判断用户是否存在，如果存在且密码正确，则保存该用户对象
+            // 判断用户名是否存在，如果存在则不予注册
             SysUser existUser = this.getUserByUserUsername(sysUser.getUserName());
             if(existUser != null){
                 return JsonResultUtils.error("用户名已存在");
