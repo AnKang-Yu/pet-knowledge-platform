@@ -1,14 +1,11 @@
 package xyz.dg.dgpethome.controller.client;
 
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import xyz.dg.dgpethome.model.page.ApplicationFormParam;
 import xyz.dg.dgpethome.model.page.BArticlePageParam;
 import xyz.dg.dgpethome.model.page.SysPetPageParam;
@@ -20,13 +17,11 @@ import xyz.dg.dgpethome.model.vo.SysPetVo;
 import xyz.dg.dgpethome.service.*;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
-
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

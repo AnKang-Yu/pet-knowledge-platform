@@ -9,17 +9,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.naming.AuthenticationException;
-
-
 import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.mapper.SysUserMapper;
@@ -31,13 +26,10 @@ import xyz.dg.dgpethome.service.SysUserService;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
 import xyz.dg.dgpethome.utils.MailUtils;
-
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @author  Dugong
@@ -72,11 +64,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
     @Override
     public SysUser getUserByUserUsername(String userName) {
         SysUser user = null;
-        Object o = redisTemplate.opsForValue().get("userName_"+userName);
-        if(o!=null){
+        String key = "userName_"+userName;
+        ValueOperations<String, SysUser> operations = redisTemplate.opsForValue();
+        boolean hasKey = redisTemplate.hasKey(key);
+        if(hasKey){
             //缓存中有数据
-            log.info("读取到redis缓存userName_"+userName);
-            user=(SysUser)o;
+            log.info("读取到redis缓存"+key);
+            user = operations.get(key);
         }else{
             // 缓存中没有，就进入数据库查询
             LambdaQueryWrapper<SysUser> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -87,8 +81,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
             //用getOne查询一个对象出来
             user  = this.baseMapper.selectOne(lambdaQueryWrapper);
             if(user!=null){
-                log.info("redis缓存了userName_"+userName);
-                redisTemplate.opsForValue().set("userName_"+userName ,user);
+                log.info("redis缓存了"+key);
+                operations.set(key ,user);
             }
         }
         return  user;
@@ -166,6 +160,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
     @Override
     public SysUser passwordToEncode(SysUser sysUser) {
         sysUser.setUserPassword(SaSecureUtil.sha256(sysUser.getUserPassword()));
+
         return sysUser;
     }
 
@@ -203,11 +198,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
      */
     @Override
     public JsonResult registerUser(SysUser sysUser, String code) {
-        Object o = redisTemplate.opsForValue().get("registerCode_"+sysUser.getUserEmail());
-        if(o == null){
+        String key = "registerCode_"+sysUser.getUserEmail();
+        ValueOperations<String, String> operations = redisTemplate.opsForValue();
+        boolean hasKey = redisTemplate.hasKey(key);
+        if(!hasKey){
+            // 缓存中没有
             return JsonResultUtils.error("验证码无效或已过期");
         }
-        String redisCode = String.valueOf(o);
+        String redisCode = operations.get(key);
         if(redisCode.equals(code)){
             // 验证码通过
             // 判断用户名是否存在，如果存在则不予注册
@@ -225,7 +223,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
             SysUser encodeUser = this.passwordToEncode(sysUser);
             Integer rows = this.baseMapper.insert(encodeUser);
             // 删除缓存
-            redisTemplate.delete("registerCode_"+sysUser.getUserEmail());
+            redisTemplate.delete(key);
             if(rows > 0){
                 //200
                 return JsonResultUtils.success("注册成功");
@@ -258,18 +256,33 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
         return JsonResultUtils.success("验证发已发送");
     }
 
+    /**
+     * 更改当前用户信息
+     * @param sysUser
+     * @return
+     */
     @Override
     public JsonResult editCurrentUserInfo(SysUser sysUser) {
         Boolean rows = this.updateById(sysUser);
         if(rows){
             //200
             // 清除原先的缓存
-            redisTemplate.delete("userName_"+sysUser.getUserName());
+            String key = "userName_"+sysUser.getUserName();
+            if( redisTemplate.hasKey(key)){
+                // 有则删除缓存
+                redisTemplate.delete(key);
+            }
             return JsonResultUtils.success("编辑成功");
         }
         return JsonResultUtils.success("编辑失败");
     }
 
+    /**
+     * 忘记密码的发送验证码
+     * @param sysUser
+     * @return
+     * @throws MessagingException
+     */
     @Override
     public JsonResult getRetrieveCode(SysUser sysUser) throws MessagingException {
         if(sysUser.getUserEmail() == null){
@@ -290,11 +303,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
         if(userName == null || newPwd == null || code == null){
             return JsonResultUtils.error("请求参数错误");
         }
-        Object o = redisTemplate.opsForValue().get("retrieveCode_"+userName);
-        if(o == null){
+        String key = "retrieveCode_"+userName;
+        ValueOperations<String, String> operations = redisTemplate.opsForValue();
+        boolean hasKey = redisTemplate.hasKey(key);
+        if(!hasKey){
             return JsonResultUtils.error("验证码无效或已过期");
         }
-        String redisCode = String.valueOf(o);
+        String redisCode = operations.get(key);
         if(redisCode.equals(code)){
             // 验证码通过
             // 取用户
@@ -304,8 +319,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
             SysUser encodeUser = this.passwordToEncode(existUser);
             Boolean rows = this.updateById(encodeUser);
             // 删除缓存
-            redisTemplate.delete("registerCode_"+userName);
-            redisTemplate.delete("userName_"+userName);
+            if(redisTemplate.hasKey(key)){
+                redisTemplate.delete(key);
+            }
+            if(redisTemplate.hasKey("userName_"+userName)){
+                redisTemplate.delete("userName_"+userName);
+            }
             if(rows ){
                 //200
                 return JsonResultUtils.success("更新密码成功");
@@ -316,6 +335,4 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper,SysUser> imple
         //500
         return JsonResultUtils.error("验证码错误");
     }
-
-
 }

@@ -140,7 +140,6 @@ public class BArticleController {
         }
         //500
         return JsonResultUtils.error("编辑文章失败");
-        // return JsonResultUtils.success("编辑文章成功");
     }
 
     @PostMapping("/article/changeArticleAllowCommentStatus")

@@ -46,21 +46,21 @@ public class AdminController {
     @Resource
     FilesUtils filesUtils;
 
-    /**
-     * 测试
-     * @param loginInfo
-     * @return
-     */
-    @GetMapping("/admin/hello")
-    public JsonResult hello(@RequestBody Map<String,String> loginInfo){
-        String username =  loginInfo.get("username");
-        String password =  loginInfo.get("password");
-        Map<String, String> data = new HashMap<>();
-        data.put("username",username);
-        data.put("password",password);
-        String msg = "登录成功";
-        return JsonResultUtils.success(msg,data);
-    }
+//    /**
+//     * 测试
+//     * @param loginInfo
+//     * @return
+//     */
+//    @GetMapping("/admin/hello")
+//    public JsonResult hello(@RequestBody Map<String,String> loginInfo){
+//        String username =  loginInfo.get("username");
+//        String password =  loginInfo.get("password");
+//        Map<String, String> data = new HashMap<>();
+//        data.put("username",username);
+//        data.put("password",password);
+//        String msg = "登录成功";
+//        return JsonResultUtils.success(msg,data);
+//    }
     /**
      * 登录
      * @return
@@ -83,17 +83,12 @@ public class AdminController {
             Map<String, Object> data = new HashMap<>();
             log.info("token: "+tokenInfo.tokenValue);
             data.put("token",tokenInfo.tokenValue);
-
-
             return JsonResultUtils.success("登录成功",data);
-
         } catch (Exception e) {
             e.printStackTrace();
             //return ResultData.error(ResultCode.ERROR, e.getMessage());
+            return JsonResultUtils.error("登录失败");
         }
-
-        return JsonResultUtils.error("登录失败");
-
     }
 
     /**

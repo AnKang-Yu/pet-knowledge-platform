@@ -1,11 +1,14 @@
 spring:
   redis:
+    # Redis服务器地址
     host: 127.0.0.1
+    # Redis服务器连接端口
     port: 6379
+    # Redis服务器连接密码（默认为空）
     password:
     jedis:
       pool:
-        # \u8FDE\u63A5\u6C60\u6700\u5927\u8FDE\u63A5\u6570
+        # 连接池中的最大空闲连接
         max-active: 8
-        # \u8FDE\u63A5\u6C60\u4E2D\u7684\u6700\u5927\u7A7A\u95F2\u8FDE\u63A5
+        # 连接池中的最小空闲连接
         max-idle: 8

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
@@ -84,21 +85,21 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
     @Override
     public   List<CascaderSysDictVo> findAllTagsList(){
         // 只找 2和6底下的字典用于文章 分别是动物大科和性别
-
-        List<CascaderSysDictVo> result = null;
+        ValueOperations<String, List<CascaderSysDictVo>> operations = redisTemplate.opsForValue();
+        String key = "CascaderDictVoListToUseArticle";
         // 用于文章标签的缓存
-        Object o = redisTemplate.opsForValue().get("CascaderDictVoListToUseArticle");
-        if(o!=null){
-            //缓存中有数据
-            log.info("读取到redis缓存CascaderDictVoListToUseArticle");
-            result=(List<CascaderSysDictVo>) o;
+        List<CascaderSysDictVo> result = null;
+        boolean hasKey = redisTemplate.hasKey(key);
+        if(hasKey) {
+            log.info("读取到redis缓存" + key);
+            result = operations.get(key);
         }else{
             // 缓存中没有，就进入数据库查询
             List<CascaderSysDictVo> data = this.sysDictServiceImpl.findAllDictByParentId(0);
             result = data.stream().filter(item->item.getDictId().equals(2)||item.getDictId().equals(6)).collect(Collectors.toList());
             if(result!=null){
-                log.info("redis缓存了CascaderDictVoListToUseArticle");
-                redisTemplate.opsForValue().set("CascaderDictVoListToUseArticle" ,result);
+                log.info("redis缓存了" + key);
+                operations.set(key,result);
             }
         }
         return result;

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -74,17 +75,20 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     @Override
     public  List<SysDictVo>  findDictByParentId(Integer dictParentId){
         List<SysDictVo> list = null;
-        Object o = redisTemplate.opsForValue().get("SysDictVoListByParentId_"+dictParentId);
-        if(o!=null){
-            //缓存中有数据
-            log.info("读取到redis缓存SysDictVoListByParentId_"+dictParentId);
-            list=(List<SysDictVo>)o;
+        String key = "SysDictVoListByParentId_"+dictParentId;
+        ValueOperations<String, List<SysDictVo>> operations = redisTemplate.opsForValue();
+        // 查询缓存
+        boolean hasKey = redisTemplate.hasKey(key);
+        if(hasKey){
+            // 缓存中有数据
+            log.info("读取到redis缓存"+key);
+            list = operations.get(key);
         }else{
             // 缓存中没有，就进入数据库查询
             list = sysDictMapper.findDictByParentId(dictParentId);
             if(list!=null){
-                log.info("redis缓存了SysDictVoListByParentId_"+dictParentId);
-                redisTemplate.opsForValue().set("SysDictVoListByParentId_"+dictParentId ,list);
+                log.info("redis缓存了"+key);
+                operations.set(key, list);
             }
         }
         return list;
@@ -97,18 +101,22 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
      */
     @Override
     public List<CascaderSysDictVo>  findAllDictByParentId(Integer dictParentId){
+
+        String key = "CascaderAllDictVoListByParentId_" + dictParentId;
+        ValueOperations<String, List<CascaderSysDictVo>> operations = redisTemplate.opsForValue();
         List<CascaderSysDictVo> list = null;
-        Object o = redisTemplate.opsForValue().get("CascaderAllDictVoListByParentId_"+dictParentId);
-        if(o!=null){
-            //缓存中有数据
-            log.info("读取到redis缓存CascaderAllDictVoListByParentId_"+dictParentId);
-            list=(List<CascaderSysDictVo>)o;
+        // 缓存存在
+        boolean hasKey = redisTemplate.hasKey(key);
+        if(hasKey){
+            // 缓存中有数据
+            log.info("读取到redis缓存"+key);
+            list = operations.get(key);
         }else{
             // 缓存中没有，就进入数据库查询
             list = this.getTreeDataLoop(dictParentId,new ArrayList<>());
             if(list!=null){
-                log.info("redis缓存了CascaderAllDictVoListByParentId_"+dictParentId);
-                redisTemplate.opsForValue().set("CascaderAllDictVoListByParentId_"+dictParentId ,list);
+                log.info("redis缓存了"+key);
+                operations.set(key ,list);
             }
         }
         return list;
