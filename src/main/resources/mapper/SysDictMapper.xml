@@ -47,4 +47,31 @@
         </if>
     </where>
   </select>
+
+<!--    耗时的全字段查找 -->
+<!--  <select id="findAllDictByParentId" resultMap="BaseTreeResultMap" >-->
+<!--    SELECT-->
+<!--    dict_id, dict_value-->
+<!--    FROM `sys_dict`-->
+<!--    WHERE dict_parent_id = #{dictParentId,jdbcType=INTEGER}-->
+<!--  </select>-->
+<!--   <resultMap id="BaseTreeResultMap" type="xyz.dg.dgpethome.model.vo.CascaderSysDictVo">-->
+<!--    <id column="dict_id" jdbcType="INTEGER" property="dictId" />-->
+<!--    <result column="dict_value" jdbcType="VARCHAR" property="dictValue" />-->
+<!--    <collection column="dict_id" property="children" javaType="java.util.ArrayList"-->
+<!--                ofType="xyz.dg.dgpethome.model.vo.CascaderSysDictVo" select="getNextNodeTree"/>-->
+<!--  </resultMap>-->
+
+<!--    <select id="getNextNodeTree" resultMap="NextTreeResultMap">-->
+<!--    SELECT-->
+<!--     dict_id, dict_value-->
+<!--    FROM `sys_dict`-->
+<!--    WHERE dict_parent_id = #{dict_id}-->
+<!--  </select>-->
+<!--  <resultMap id="NextTreeResultMap" type="xyz.dg.dgpethome.model.vo.CascaderSysDictVo">-->
+<!--    <id column="dict_id" jdbcType="INTEGER" property="dictId" />-->
+<!--    <result column="dict_value" jdbcType="VARCHAR" property="dictValue" />-->
+<!--    <collection column="dict_id" property="children" javaType="java.util.ArrayList"-->
+<!--                ofType="xyz.dg.dgpethome.model.vo.CascaderSysDictVo" select="getNextNodeTree"/>-->
+<!--  </resultMap>-->
 </mapper>

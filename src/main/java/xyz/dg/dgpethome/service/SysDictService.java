@@ -24,4 +24,6 @@ public interface SysDictService extends IService<SysDict> {
     List<SysDictVo>   findDictByParentId(Integer dictParentId);
 
     List<CascaderSysDictVo>  findAllDictByParentId(Integer dictParentId);
+
+//    List<CascaderSysDictVo>  test(Integer dictParentId);
 }

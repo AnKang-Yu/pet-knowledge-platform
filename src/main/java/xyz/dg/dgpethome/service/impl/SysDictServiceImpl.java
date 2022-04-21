@@ -93,7 +93,11 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         }
         return list;
     }
-
+    //太耗时
+//    @Override
+//    public List<CascaderSysDictVo>  test(Integer dictParentId){
+//        return sysDictMapper.findAllDictByParentId(dictParentId);
+//    }
     /**
      * 根据父字典ID查找所有该父字典底下的所有子字典
      * @param dictParentId

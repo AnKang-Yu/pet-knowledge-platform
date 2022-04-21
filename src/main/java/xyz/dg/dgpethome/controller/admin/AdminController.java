@@ -175,8 +175,10 @@ public class AdminController {
     @PutMapping("/admin/editUser")
     public JsonResult editSysUser(@RequestBody SysUser sysUser){
         log.info("执行编辑用户方法");
+        //编辑用户的密码加密
+        SysUser encodeUser =  sysUserServiceImpl.passwordToEncode(sysUser);
         //影响行数
-        boolean rows = sysUserServiceImpl.updateById(sysUser);
+        boolean rows = sysUserServiceImpl.updateById(encodeUser);
         if(rows){
             //200
             return JsonResultUtils.success("编辑用户成功");

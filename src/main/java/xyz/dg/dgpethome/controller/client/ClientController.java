@@ -61,7 +61,7 @@ public class ClientController {
         return JsonResultUtils.success("查询成功",articleList);
     }
 
-    /**
+    /**getArticleList
      * 根据文章Id查询文章详情
      * @param articleId
      * @return JsonResult
@@ -256,7 +256,6 @@ public class ClientController {
         log.info(sysUser.toString());
         String code = map.get("verificationCode").toString();
         log.info(code);
-
         return sysUserServiceImpl.registerUser(sysUser, code);
     }
     @GetMapping("/api/getRegisterCode")

@@ -23,7 +23,7 @@ import java.time.Duration;
  * @description
  **/
 @Configuration
-//@EnableCaching
+//@EnableCaching  //开启注解式缓存
 public class RedisConfig {
     /**
      * API方式 自定义RedisTemplate 实现Json数据缓存
@@ -79,4 +79,16 @@ public class RedisConfig {
         return cacheManager;
     }
 
+//    /**
+//     * key生成策略
+//     * */
+//    @Bean
+//    public KeyGenerator accountKeyGenerator() {
+//        return new KeyGenerator(){
+//            @Override
+//            public Object generate(Object target, Method method, Object... params) {
+//                return target.getClass().toString() ;
+//            }
+//        };
+//    }
 }

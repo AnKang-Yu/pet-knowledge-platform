@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import xyz.dg.dgpethome.model.page.SysDictPageParam;
 import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysDict;
+import xyz.dg.dgpethome.model.vo.CascaderSysDictVo;
 import xyz.dg.dgpethome.model.vo.SysDictVo;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
 import xyz.dg.dgpethome.service.SysDictService;
@@ -14,6 +15,7 @@ import xyz.dg.dgpethome.utils.JsonResultUtils;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +45,11 @@ public class DictController {
         return JsonResultUtils.success("查询成功",dictList);
 
     }
-
+//    @GetMapping("/api/search/testDict")
+//    public JsonResult findAllDictByParentId(){
+//        List<CascaderSysDictVo> data = sysDictServiceImpl.test(0);
+//        return JsonResultUtils.success("查询成功",data);
+//    }
     /**
      * 新增字典
      * @return

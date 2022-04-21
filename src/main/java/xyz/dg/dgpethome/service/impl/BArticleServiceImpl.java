@@ -370,11 +370,10 @@ public class BArticleServiceImpl extends ServiceImpl<BArticleMapper, BArticle> i
         IPage<BArticleVo> bArticleVoIPage = bArticleMapper.findArticleList(new Page<BArticleVo>(currentPage,pageSize),bArticlePageParam);
 
         List<BArticleVo> records = bArticleVoIPage.getRecords();
-        // System.out.println(records);
+        // 根据文章标签表设置文章的标签
         for(BArticleVo bArticleVo : records){
             bArticleVo.setArticleTags(this.bArticleTagsServiceImpl.getBaseMapper().selectList(new LambdaQueryWrapper<BArticleTags>().eq(BArticleTags::getArticleId,bArticleVo.getArticleId())));
         }
-        // System.out.println(records);
         bArticleVoIPage.setRecords(records);
         return bArticleVoIPage;
     }
