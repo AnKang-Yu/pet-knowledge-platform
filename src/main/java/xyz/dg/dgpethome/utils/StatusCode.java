@@ -14,6 +14,7 @@ public class StatusCode {
     /**
      * 错误状态码
      */
+    public static final Integer FAIL_LOGIN_CODE = 400;
     public static final Integer ERROR_CODE = 500;
     /**
      * 无权限

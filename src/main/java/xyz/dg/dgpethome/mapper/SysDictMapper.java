@@ -22,6 +22,8 @@ import xyz.dg.dgpethome.model.vo.SysUserVo;
  * @description
  **/
 public interface SysDictMapper extends BaseMapper<SysDict> {
+    @Select("SELECT * FROM `sys_dict` WHERE `dict_id` = #{roleId}")
+    SysDict loadRoleByUserRoleId(Integer roleId);
 
     IPage<SysDictVo> findDictList(IPage<SysDictVo> page , @Param("sysDictPageParam") SysDictPageParam sysDictPageParam);
 

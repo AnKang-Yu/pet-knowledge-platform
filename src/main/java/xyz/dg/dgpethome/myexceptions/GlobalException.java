@@ -1,12 +1,7 @@
 package xyz.dg.dgpethome.myexceptions;
 
-import cn.dev33.satoken.exception.NotLoginException;
-import cn.dev33.satoken.exception.NotPermissionException;
-import com.alibaba.druid.support.spring.stat.annotation.Stat;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.ResponseBody;
+
+import org.springframework.web.bind.annotation.*;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
 import xyz.dg.dgpethome.utils.StatusCode;
@@ -21,9 +16,9 @@ import java.util.Map;
  * @author Dugong
  * @date 2021-10-04 10:28
  * @description
- * 全局异常类
+ * 全局异常类处理   @RestControllerAdvice 可指定包前缀，比如：(basePackages = "com.pj.admin")
  **/
-@ControllerAdvice // 可指定包前缀，比如：(basePackages = "com.pj.admin")
+@RestControllerAdvice
 public class GlobalException {
 
 
@@ -36,7 +31,6 @@ public class GlobalException {
 
 
     // 全局异常拦截（拦截项目中的所有异常）
-    @ResponseBody
     @ExceptionHandler
     public JsonResult handlerException(Exception e, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
@@ -46,15 +40,15 @@ public class GlobalException {
         e.printStackTrace();
 
         Map<String, Object> data = new HashMap<>();
-        data.put("url",request.getRequestURI().toString());
-        data.put("data",e.getMessage());
+        data.put("error_url",request.getRequestURI());
+        data.put("error_msg",e.getMessage());
 
         JsonResult jsonResult = null;
         // 不同异常返回不同状态码
         if (e instanceof NotLoginException) {
             // 如果是未登录异常
             jsonResult = JsonResultUtils.error("未登录异常", StatusCode.NO_LOGIN_CODE,data);
-        }  else if (e instanceof NotPermissionException) {
+        }  else if (e instanceof NotAuthException) {
             // 如果是权限异常
             jsonResult = JsonResultUtils.error("权限异常", StatusCode.NO_AUTH_CODE,data);
         }else {

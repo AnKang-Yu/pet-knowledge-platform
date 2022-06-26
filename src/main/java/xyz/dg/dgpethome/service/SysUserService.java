@@ -1,20 +1,18 @@
 package xyz.dg.dgpethome.service;
 
-import java.util.List;
 import java.util.Map;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
 import xyz.dg.dgpethome.model.vo.SysUserVo;
-import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
+import xyz.dg.dgpethome.myexceptions.NotAuthException;
 import xyz.dg.dgpethome.utils.JsonResult;
 
 import javax.mail.MessagingException;
-//import xyz.dg.dgpethome.myexceptions.MyAuthenticationException;
+//import xyz.dg.dgpethome.myexceptions.NotAuthException;
 
 /**
  * @author  Dugong
@@ -22,13 +20,22 @@ import javax.mail.MessagingException;
  * @description
  **/
 public interface SysUserService extends IService<SysUser> {
-
     /**
-     * 通过账号查询用户
+     * gen
      * @param userName
      * @return
+     * @throws UsernameNotFoundException
      */
-    SysUser getUserByUserUsername(String userName);
+    SysUser loadUserByUsername(String userName) ;
+
+    SysUser getUserById(Integer userId);
+
+//    /**
+//     * 通过账号查询用户
+//     * @param userName
+//     * @return
+//     */
+//    SysUser getUserByUserUsername(String userName);
 
     /**
      * 个性化验证登录
@@ -36,7 +43,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param rawPassword 原始密码
      * @return
      */
-    SysUser checkLogin(String userName,String rawPassword) throws MyAuthenticationException;
+//    SysUser checkLogin(String userName,String rawPassword) throws NotAuthException;
 
     /**
      * 分页查询并包装

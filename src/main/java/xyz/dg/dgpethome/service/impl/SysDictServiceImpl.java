@@ -40,6 +40,12 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
     @Resource
     private SysDictMapper sysDictMapper;
+
+    @Override
+    public SysDict loadRoleByUserRoleId(Integer roleId) {
+        return sysDictMapper.loadRoleByUserRoleId(roleId);
+    }
+
     /**
      * 查询字典
      * @param sysDictPageParam

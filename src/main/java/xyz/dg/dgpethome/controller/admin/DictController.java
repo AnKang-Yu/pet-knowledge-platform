@@ -38,18 +38,9 @@ public class DictController {
      */
     @GetMapping("/dict/findDictList")
     public JsonResult findDictList(SysDictPageParam sysDictPageParam){
-        log.info("查找的字典参数 ： " + sysDictPageParam.toString());
-        //IPage<SysUserVo> userList = sysUserServiceImpl.testPage(sysUserPageParam);
         IPage<SysDictVo> dictList = sysDictServiceImpl.findDictList(sysDictPageParam);
-        //System.out.println(userList.toString());
         return JsonResultUtils.success("查询成功",dictList);
-
     }
-//    @GetMapping("/api/search/testDict")
-//    public JsonResult findAllDictByParentId(){
-//        List<CascaderSysDictVo> data = sysDictServiceImpl.test(0);
-//        return JsonResultUtils.success("查询成功",data);
-//    }
     /**
      * 新增字典
      * @return

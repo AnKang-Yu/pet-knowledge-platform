@@ -1,6 +1,6 @@
 package xyz.dg.dgpethome.controller.client;
 
-import cn.dev33.satoken.stp.StpUtil;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,9 +14,12 @@ import xyz.dg.dgpethome.model.vo.BArticleVo;
 import xyz.dg.dgpethome.model.vo.BRescueApplicationFormVo;
 import xyz.dg.dgpethome.model.vo.SysDictVo;
 import xyz.dg.dgpethome.model.vo.SysPetVo;
+import xyz.dg.dgpethome.myexceptions.NotLoginException;
 import xyz.dg.dgpethome.service.*;
 import xyz.dg.dgpethome.utils.JsonResult;
 import xyz.dg.dgpethome.utils.JsonResultUtils;
+import xyz.dg.dgpethome.utils.SecureUtils;
+
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -144,19 +147,13 @@ public class ClientController {
 
     }
     /**
-     * 客户端获取当前用户信息
+     * 客户端获取当前用户信息(脱敏)
      * @return
      */
     @GetMapping("/api/select/getCurrentUserInfo")
     public JsonResult getCurrentUserInfo(HttpServletRequest request) throws Exception {
-        //根据传来的token获取id
-        String token = request.getHeader("Authorization");
-        log.info("后台传入的token: "+token);
-        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
-        if(userId == null){
-            return JsonResultUtils.error("获取信息失败");
-        }
-        SysUser sysUser = sysUserServiceImpl.getBaseMapper().selectById(userId);
+        //
+        SysUser sysUser = SecureUtils.getSpringSecurityUser();
         Map<String, Object> data = sysUserServiceImpl.dataMaskUserInfo(sysUser);
         return JsonResultUtils.success("获取信息成功",data);
     }
@@ -166,10 +163,10 @@ public class ClientController {
      * @return
      */
     @GetMapping("/api/select/getPetListByOwnId")
-    public JsonResult getPetListByOwnId(HttpServletRequest request, SysPetPageParam sysPetPageParam){
+    public JsonResult getPetListByOwnId(HttpServletRequest request, SysPetPageParam sysPetPageParam) throws NotLoginException {
         String token = request.getHeader("Authorization");
         log.info("后台传入的token: "+token);
-        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
+        Integer userId = SecureUtils.getSpringSecurityUser().getUserId() ;
         sysPetPageParam.setPetOwnerId(userId);
 
         log.info("查找的宠物参数: "+sysPetPageParam.toString());
@@ -194,19 +191,17 @@ public class ClientController {
      * @return JsonResult
      */
     @GetMapping("/api/select/getPetRescueFormList")
-    public JsonResult getPetRescueFormList(HttpServletRequest request, ApplicationFormParam applicationFormParam){
-        String token = request.getHeader("Authorization");
-        log.info("前台传入的token: "+token);
-        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
+    public JsonResult getPetRescueFormList(HttpServletRequest request, ApplicationFormParam applicationFormParam) throws NotLoginException {
+        Integer userId = SecureUtils.getSpringSecurityUser().getUserId() ;
         IPage<BRescueApplicationFormVo> data = bRescueApplicationFormImpl.getPetRescueFormList(applicationFormParam,userId);
         return JsonResultUtils.success("根据Id查询宠物成功",data);
     }
 
     @GetMapping("/api/select/getPersonalArticleList")
-    public JsonResult getPersonalArticleList(HttpServletRequest request,BArticlePageParam articleInfo){
-        String token = request.getHeader("Authorization");
-        log.info("前台传入的token: "+token);
-        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
+    public JsonResult getPersonalArticleList(HttpServletRequest request,BArticlePageParam articleInfo) throws NotLoginException {
+//        String token = request.getHeader("Authorization");
+//        log.info("前台传入的token: "+token);
+        Integer userId = SecureUtils.getSpringSecurityUser().getUserId() ;
         Integer articleStatusId = articleInfo.getArticleStatus();
         // log.info("articleStatusId="+articleStatusId);
         List<BArticleVo> data = bArticleServiceImpl.getPersonalArticleList(articleStatusId,userId);
@@ -215,13 +210,13 @@ public class ClientController {
     }
 
     @GetMapping("/api/select/getArticleFormDetailInfo")
-    public JsonResult getArticleFormDetailInfo(HttpServletRequest request, @RequestParam  String articleId){
+    public JsonResult getArticleFormDetailInfo(HttpServletRequest request, @RequestParam  String articleId) throws NotLoginException {
         if(articleId == null){
             return JsonResultUtils.error("查询失败,文章id参数为空");
         }
         String token = request.getHeader("Authorization");
         log.info("前台传入的token: "+token);
-        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token)) ;
+        Integer userId = SecureUtils.getSpringSecurityUser().getUserId() ;
         return bArticleApplicationFormServiceImpl.getArticleFormDetailInfo(Long.parseLong(articleId) ,userId);
     }
 
@@ -258,6 +253,13 @@ public class ClientController {
         log.info(code);
         return sysUserServiceImpl.registerUser(sysUser, code);
     }
+
+    /**
+     * 注册验证码
+     * @param userEmail
+     * @return
+     * @throws MessagingException
+     */
     @GetMapping("/api/getRegisterCode")
     public JsonResult getRegisterCode(@RequestParam String userEmail) throws MessagingException {
         log.info("获取验证码"+userEmail);
@@ -272,7 +274,7 @@ public class ClientController {
      */
     @PutMapping("/api/update/editPersonalPet")
     public JsonResult editPersonalPet(@RequestBody SysPet sysPet){
-        log.info("执行编辑宠物方法");
+//        log.info("执行编辑宠物方法");
         // 未来这要加校验
         // TODO
         // 校验是不是他自己的宠物
@@ -292,7 +294,7 @@ public class ClientController {
      */
     @PostMapping("/api/insert/saveDraft")
     public JsonResult saveDraft(@RequestBody BArticle bArticle){
-        log.info("文章草稿"+  bArticle.toString());
+//        log.info("文章草稿"+  bArticle.toString());
         // 草稿的字典码
         bArticle.setArticleStatus(93);
         boolean rows = false;
@@ -320,7 +322,7 @@ public class ClientController {
      */
     @PostMapping("/api/insert/pushPersonArticle")
     public JsonResult pushPersonArticle( @RequestBody BArticlePlus bArticlePlus) throws IOException {
-        log.info("执行客户端发布文章方法" + bArticlePlus.toString());
+//        log.info("执行客户端发布文章方法" + bArticlePlus.toString());
 
         // log.info("文件:" + file.getOriginalFilename());
         // log.info(bArticlePlus.getArticleTitle());
@@ -349,13 +351,13 @@ public class ClientController {
      * @return
      */
     @PutMapping("/api/update/backoutRescueFormById")
-    public JsonResult backoutRescueFormById(HttpServletRequest request,@RequestBody Map<String,String> formInfo){
+    public JsonResult backoutRescueFormById(HttpServletRequest request,@RequestBody Map<String,String> formInfo) throws NotLoginException {
         Long formId = Long.parseLong(formInfo.get("formId"));
-        log.info("执行撤销请求 "+formId);
+//        log.info("执行撤销请求 "+formId);
         Long petId = Long.parseLong(formInfo.get("petId"));
-        String token = request.getHeader("Authorization");
+//        String token = request.getHeader("Authorization");
         // 当前用户
-        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token));
+        Integer userId = SecureUtils.getSpringSecurityUser().getUserId();
         // 审批失效的字符编码是106
         Integer target = 106;
         int rows = bRescueApplicationFormImpl.backoutRescueFormById(106,formId,userId);
@@ -379,11 +381,11 @@ public class ClientController {
      * @return
      */
     @PutMapping("/api/update/editCurrentUserInfo")
-    public JsonResult editCurrentUserInfo(HttpServletRequest request, @RequestBody SysUser sysUser){
-        log.info("编辑用户信息方法");
-        String token = request.getHeader("Authorization");
+    public JsonResult editCurrentUserInfo(HttpServletRequest request, @RequestBody SysUser sysUser) throws NotLoginException {
+//        log.info("编辑用户信息方法");
+//        String token = request.getHeader("Authorization");
         // 当前用户
-        Integer userId = Integer.parseInt((String) StpUtil.getLoginIdByToken(token));
+        Integer userId = SecureUtils.getSpringSecurityUser().getUserId();
         if(userId.equals(sysUser.getUserId())){
             // 真的是自己在修改
             sysUser.setUpdateUser(userId);
@@ -427,13 +429,13 @@ public class ClientController {
 
     /**
      * 校验用户并发送验证码
-     * @param userName
+     * @param username
      * @return
      * @throws MessagingException
      */
-    @GetMapping("/api/search/estimateUserByUserName")
-    public JsonResult estimateUserByUserName(@RequestParam String userName) throws MessagingException {
-        SysUser userByUserUsername = this.sysUserServiceImpl.getUserByUserUsername(userName);
+    @GetMapping("/api/search/estimateUserByUsername")
+    public JsonResult estimateUserByUsername(@RequestParam String username) throws MessagingException {
+        SysUser userByUserUsername = this.sysUserServiceImpl.loadUserByUsername(username);
         if(userByUserUsername == null){
             return JsonResultUtils.error("无此用户");
         }
@@ -444,7 +446,7 @@ public class ClientController {
     public JsonResult resetUserPwd(@RequestBody Map<String,Object> map){
         String code = map.get("verificationCode").toString();
         String newPwd = map.get("newPwd").toString();
-        String name = map.get("userName").toString();
+        String name = map.get("username").toString();
         return sysUserServiceImpl.resetUserPwd(name,newPwd,code);
     }
 

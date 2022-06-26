@@ -18,6 +18,7 @@ import xyz.dg.dgpethome.model.vo.SysDictVo;
  * @description
  **/
 public interface SysDictService extends IService<SysDict> {
+    SysDict loadRoleByUserRoleId(Integer roleId);
 
     IPage<SysDictVo> findDictList(SysDictPageParam sysDictPageParam);
 

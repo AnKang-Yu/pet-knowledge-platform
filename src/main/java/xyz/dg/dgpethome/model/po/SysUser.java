@@ -1,13 +1,20 @@
 package xyz.dg.dgpethome.model.po;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import xyz.dg.dgpethome.config.auth.CustomAuthorityDeserializer;
 
 /**
  * @author  Dugong
@@ -17,11 +24,12 @@ import lombok.NoArgsConstructor;
 /**
     * 用户表
     */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("sys_user")
-public class SysUser implements Serializable {
+public class SysUser implements Serializable, UserDetails {
     /**
     * 用户表主键
     */
@@ -46,7 +54,7 @@ public class SysUser implements Serializable {
     /**
     * 用户名
     */
-    private String userName;
+    private String username;
 
     /**
     * 头像
@@ -113,4 +121,45 @@ public class SysUser implements Serializable {
     private String userToken;
 
     private static final long serialVersionUID = 1L;
+
+    private Collection<? extends GrantedAuthority> authorities;
+    @Override
+    @JsonDeserialize(using = CustomAuthorityDeserializer.class)
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return getUserPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isEnabled() {
+        return true;
+    }
 }

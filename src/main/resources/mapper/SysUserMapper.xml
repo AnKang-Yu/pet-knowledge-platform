@@ -9,7 +9,7 @@
     <result column="user_account" jdbcType="VARCHAR" property="userAccount" />
     <result column="user_password" jdbcType="VARCHAR" property="userPassword" />
     <result column="user_salt" jdbcType="VARCHAR" property="userSalt" />
-    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="user_avatar" jdbcType="VARCHAR" property="userAvatar" />
     <result column="user_email" jdbcType="VARCHAR" property="userEmail" />
     <result column="user_phone" jdbcType="VARCHAR" property="userPhone" />
@@ -34,16 +34,17 @@
     <!--@Table `sys_user`-->
     <id column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="user_account" jdbcType="VARCHAR" property="userAccount" />
-    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="user_sex" jdbcType="TINYINT" property="userSex" />
     <result column="user_role_id" jdbcType="INTEGER" property="userRoleId" />
     <result column="user_status" jdbcType="INTEGER" property="userStatus" />
   </resultMap>
   <sql id="Base_Column_List_Vo">
     <!--@mbg.generated-->
-    `user_id`, `user_account`, `user_name`,  `user_sex`, `user_role_id`,  `user_status`
+    `user_id`, `user_account`, `username`,  `user_sex`, `user_role_id`,  `user_status`
   </sql>
 <!--parameterType="xyz.dg.dgpethome.model.page.SysUserPageParam"-->
+<!--查询用户列表(不包括自己)-->
   <select id="findUserList" resultMap="BaseResultMap_Vo"  >
     SELECT
       <include refid="Base_Column_List_Vo" />
@@ -56,9 +57,9 @@
             <if test="userId != null">
                 and u.user_id != #{userId}
             </if>
-            <if test="sysUserPageParam.userName != null">
+            <if test="sysUserPageParam.username != null">
                 and
-                u.user_name LIKE concat('%',#{sysUserPageParam.userName,jdbcType=VARCHAR},'%')
+                u.username LIKE concat('%',#{sysUserPageParam.username,jdbcType=VARCHAR},'%')
             </if>
 
         </where>

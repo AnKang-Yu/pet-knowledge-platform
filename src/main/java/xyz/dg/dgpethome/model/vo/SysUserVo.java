@@ -22,7 +22,7 @@ public class SysUserVo  {
     /**
      * 用户名
      */
-    private String userName;
+    private String username;
     /**
      * 用户账号
      */

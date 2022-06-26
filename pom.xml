@@ -27,17 +27,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.28</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba</groupId>-->
+<!--            <artifactId>fastjson</artifactId>-->
+<!--            <version>1.2.28</version>-->
+<!--        </dependency>-->
         <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
-        <dependency>
-            <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-spring-boot-starter</artifactId>
-            <version>1.26.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.dev33</groupId>-->
+<!--            <artifactId>sa-token-spring-boot-starter</artifactId>-->
+<!--            <version>1.26.0</version>-->
+<!--        </dependency>-->
         <!--    工具包    -->
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
@@ -59,12 +59,24 @@
 <!--            <artifactId>fastjson</artifactId>-->
 <!--            <version>1.2.62</version>-->
 <!--        </dependency>-->
+        <dependency>
+            <groupId>com.diffplug.guava</groupId>
+            <artifactId>guava-cache</artifactId>
+            <version>19.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
         <!--token生成和解析-->
-<!--        <dependency>-->
-<!--            <groupId>io.jsonwebtoken</groupId>-->
-<!--            <artifactId>jjwt</artifactId>-->
-<!--            <version>0.9.1</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
         <!--解决生成的token存储 -->
 <!--        <dependency>-->
 <!--            <groupId>com.diffplug.guava</groupId>-->
@@ -85,21 +97,12 @@
 <!--            <artifactId>springfox-swagger-ui</artifactId>-->
 <!--            <version>2.9.2</version>-->
 <!--        </dependency>-->
-        <!-- spring security        -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-security</artifactId>-->
-<!--        </dependency>-->
-        <!--   security和  thymeleaf的整合包，实现对应权限显示对应页面   -->
-<!--        <dependency>-->
-<!--            <groupId>org.thymeleaf.extras</groupId>-->
-<!--            <artifactId>thymeleaf-extras-springsecurity5</artifactId>-->
-<!--        </dependency>-->
-        <!--  thymeleaf      -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-thymeleaf</artifactId>-->
-<!--        </dependency>-->
+        <!--  spring security starter 必须  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- 阿里巴巴数据源 -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -153,11 +156,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.security</groupId>-->
-<!--            <artifactId>spring-security-test</artifactId>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

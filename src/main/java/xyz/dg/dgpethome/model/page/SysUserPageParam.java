@@ -22,7 +22,7 @@ public class SysUserPageParam extends PageParam{
     /**
      * 用户名
      */
-    private String userName;
+    private String username;
     /**
      * 用户角色id
      */

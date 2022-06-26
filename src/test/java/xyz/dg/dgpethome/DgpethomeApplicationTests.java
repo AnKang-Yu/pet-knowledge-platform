@@ -1,12 +1,11 @@
 package xyz.dg.dgpethome;
 
 import cn.hutool.core.util.DesensitizedUtil;
-import cn.dev33.satoken.secure.SaSecureUtil;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import xyz.dg.dgpethome.model.page.SysUserPageParam;
 import xyz.dg.dgpethome.model.po.SysUser;
@@ -16,21 +15,19 @@ import xyz.dg.dgpethome.service.BArticleService;
 import xyz.dg.dgpethome.service.SysDictService;
 import xyz.dg.dgpethome.service.SysUserService;
 import xyz.dg.dgpethome.utils.FilesUtils;
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.authority.SimpleGrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import xyz.dg.dgpethome.model.po.AuthUser;
-//import xyz.dg.dgpethome.utils.JwtTokenUtil;
+
 
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.FutureTask;
 
 @SpringBootTest
 @Slf4j
@@ -46,9 +43,10 @@ class DgpethomeApplicationTests {
     private BArticleService bArticleServiceImpl;
 
     @Test
-    public void testAllDict(){
+    public void testAllDict() throws FileNotFoundException {
         List<CascaderSysDictVo> test =  sysDictServiceImpl.findAllDictByParentId(0);
         System.out.println(test.toString());
+        //String str = IOUtils.toString(new FileInputStream("/temp/a.txt"), StandardCharsets.UTF_8);
     }
 
 
@@ -87,16 +85,7 @@ class DgpethomeApplicationTests {
 
     @Test
     public void testSalt(){
-        System.out.println(SaSecureUtil.md5BySalt("123456", "kksk"));
-        System.out.println(SaSecureUtil.md5BySalt("123456", "kksk"));
-        System.out.println(SaSecureUtil.md5BySalt("123451231246", "Dugong"));
-        System.out.println(SaSecureUtil.md5BySalt("123456", "Dugong"));
-        System.out.println(SaSecureUtil.md5BySalt("123456", "114514"));
-        System.out.println(SaSecureUtil.md5BySalt("123456", "wcnm"));
-        System.out.println("19db17a0eac0ada71785ebeb4483eccf".length());
-        System.out.println("---------------------");
-        System.out.println(SaSecureUtil.sha256("123456"));
-        System.out.println(SaSecureUtil.sha256("123456"));
+
         System.out.println("8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92".length());
     }
     @Test
